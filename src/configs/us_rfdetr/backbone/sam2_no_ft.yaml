@@ -1,0 +1,14 @@
+# @package _global_
+# US-RFDETR backbone group: SAM2 (no fine-tune) — Hiera-B+ trunk
+# initialised from Meta's released SAM2-Base+ weights.
+#
+# Override `CHECKPOINT_DIR` env var to relocate Meta's release `.pt`s.
+
+defaults:
+  - override /model/image_encoder@model.image_encoder: hiera_b+
+
+scratch:
+  backbone_name: sam2_no_ft
+
+model:
+  pretrained_ckpt: ${scratch.checkpoint_dir}/SAM2/sam2.1_hiera_base_plus.pt

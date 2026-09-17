@@ -1,0 +1,8 @@
+# @package _global_
+# US-RFDETR on MMOTU-3d (ovarian-tumor ultrasound, 1 class).
+defaults:
+  - override /data_module: mmotu_3d
+
+scratch:
+  experiment_name: us_rfdetr/mmotu_3d
+  batch_size: 8

@@ -1,0 +1,8 @@
+# @package _global_
+# US-RFDETR on ACOUSLIC (fetal-abdomen video sweeps, 1 class).
+defaults:
+  - override /data_module: acouslic
+
+scratch:
+  experiment_name: us_rfdetr/acouslic
+  batch_size: 8

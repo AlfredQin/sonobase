@@ -1,0 +1,9 @@
+# ACOUSLIC fetal abdomen detection (1 class: fetal_abdomen).
+# Video-format SaUS layout (SA-V masklet JSON per video).
+_target_: nemo_cv.components.datasets.us_rfdetr.SaUSCocoDetDataModule
+
+data_root: ${scratch.dataset_dir}/ACOUSLIC
+annotation_dir: ${scratch.det_annotation_dir}/ACOUSLIC
+image_size: ${scratch.image_size}
+multiplier: ${scratch.multiplier}
+val_from_test: false

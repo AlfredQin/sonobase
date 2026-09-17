@@ -1,0 +1,51 @@
+# RF-DETR model spec — calls `build_rfdetr` with the SAM2-style image
+# encoder selected via the `image_encoder` group. The recipe's
+# `_setup_model` instantiates the image_encoder via Hydra (recursive),
+# converts the rest of this dict to kwargs, drops `_target_` and
+# `image_encoder`, and forwards everything to `build_rfdetr`.
+#
+# `num_classes: null` means "use the data module's num_classes" — the
+# recipe overrides it with the dataset's category count. Override this
+# explicitly only if you want to deliberately mis-size the head (e.g.
+# class-agnostic detection: set num_classes=1 and ignore category_id).
+defaults:
+  - image_encoder@image_encoder: hiera_b+   # default; overridden by `backbone=`
+
+# Marker so the recipe can verify it composed the right model spec; the
+# recipe doesn't actually instantiate this top-level node itself.
+_target_: nemo_cv.components.models.rfdetr.builder.build_rfdetr
+
+# ---- Backbone wiring ----
+pretrained_ckpt: null               # required; set by `backbone=<X>`
+frozen_backbone: false
+use_feature_levels: [1, 2, 3]       # P3/P4/P5 (skip the highest-resolution P2)
+
+# ---- Transformer ----
+hidden_dim: 256
+dec_layers: 3
+sa_nheads: 8
+ca_nheads: 16
+dec_n_points: 2
+dim_feedforward: 2048
+dropout: 0.0
+num_queries: 300
+num_select: 10
+group_detr: 13
+two_stage: true
+bbox_reparam: true
+lite_refpoint_refine: true
+
+# ---- Heads ----
+segmentation_head: false            # toggle on for instance segmentation
+mask_downsample_ratio: 4
+num_classes: null                   # null → recipe uses data_module.num_classes
+
+# ---- Loss ----
+aux_loss: true
+ia_bce_loss: true
+focal_alpha: 0.25
+cls_loss_coef: 1.0
+bbox_loss_coef: 5.0
+giou_loss_coef: 2.0
+mask_ce_loss_coef: 5.0
+mask_dice_loss_coef: 5.0

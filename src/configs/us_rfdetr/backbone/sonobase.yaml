@@ -1,0 +1,19 @@
+# @package _global_
+# US-RFDETR backbone group: SonoBase — TriBranchTrunk encoder
+# (Hiera-B + ConvNeXt-S + ConvNeXt-T) loaded from a SonoBase pretraining
+# checkpoint converted to single-file `.pt` via
+# `convert_sonobase_dcp_to_pt.py`.
+#
+# `model.pretrained_ckpt: ???` MUST be overridden on the CLI (or set by
+# the shell wrapper) to point at the converted `.pt` file. The bundled
+# `scripts/us_rfdetr/_resolve_ckpt.sh` handles the lazy DCP→PT
+# conversion (matches the pattern in few-shot, analysis, and benchmarks).
+
+defaults:
+  - override /model/image_encoder@model.image_encoder: hiera_b_conv_s_conv_t
+
+scratch:
+  backbone_name: sonobase
+
+model:
+  pretrained_ckpt: ???

@@ -1,0 +1,75 @@
+# SonoBase: TriBranchTrunk (Hiera-B + ConvNeXt-S + ConvNeXt-T)
+_target_: nemo_cv.components.models.sam2.modeling.backbones.image_encoder.ImageEncoder
+scalp: 1
+
+trunk:
+  _target_: nemo_cv.components.models.sonobase.image_encoder.image_pyramid_hybrid_encoder.TriBranchTrunk
+  img_size0: 256
+  img_size1: 512
+  img_size2: ${scratch.resolution}
+  # ckpt_path0 loads SAM2 weights into branch0 (Hiera) at instantiation time.
+  # During training (pretrain config tree) this is `${scratch.ckpt_path}` so
+  # branch0 is initialized from Meta's SAM2. During TEST, loading SAM2 init
+  # weights would be wasted I/O — the converted sonobase `.pt` (passed via
+  # `ckpt_path` at the recipe top level) overwrites every parameter anyway.
+  ckpt_path0: null
+  ckpt_path1: null
+  ckpt_path2: null
+
+  branch0:
+    _target_: nemo_cv.components.models.sonobase.image_encoder.hiera.HieraWrapper
+    embed_dim: 112
+    num_heads: 2
+    stages: [2, 3, 16, 3]
+    drop_path_rate: 0.
+
+  branch1:
+    _target_: nemo_cv.components.models.sonobase.image_encoder.convnext.ConvNeXtWrapper
+    model_name: convnext_small.dinov3_lvd1689m
+    pretrained: true
+    drop_path_rate: 0.
+
+  branch2:
+    _target_: nemo_cv.components.models.sonobase.image_encoder.convnext.ConvNeXtWrapper
+    model_name: convnext_tiny.dinov3_lvd1689m
+    pretrained: true
+    drop_path_rate: 0.
+
+  # Block-index splits (11 interaction groups)
+  branch0_indices: [[0,2],[2,5],[5,7],[7,9],[9,11],[11,13],[13,15],[15,17],[17,19],[19,21],[21,24]]
+  branch1_indices: [[0,3],[3,7],[7,11],[11,15],[15,19],[19,23],[23,26],[26,29],[29,32],[32,35],[35,39]]
+  branch2_indices: [[0,3],[3,7],[7,9],[9,11],[11,12],[12,13],[13,14],[14,15],[15,16],[16,17],[17,21]]
+  return_indices: [0, 1, 9, 10]
+  branch0_dims: [112, 224, 448, 448, 448, 448, 448, 448, 448, 448, 896]
+  branch1_dims: [96, 192, 384, 384, 384, 384, 384, 384, 384, 384, 768]
+  branch2_dims: [96, 192, 384, 384, 384, 384, 384, 384, 384, 384, 768]
+  num_heads: [2, 4, 8, 8, 8, 8, 8, 8, 8, 8, 16]
+  with_cross_branch_interaction: true
+  interact_type: deform_self_attn
+  init_values: 0.
+  ffn: null
+  expand_ratio: 0.25
+  merge_location: before_interact
+
+neck:
+  _target_: nemo_cv.components.models.sam2.modeling.backbones.image_encoder.FpnNeck
+  position_encoding:
+    _target_: nemo_cv.components.models.sam2.modeling.position_encoding.PositionEmbeddingSine
+    num_pos_feats: 256
+    normalize: true
+    scale: null
+    temperature: 10000
+  d_model: 256
+  backbone_channel_list: [896, 448, 224, 112]
+  fpn_top_down_levels: [2, 3]
+  fpn_interp_model: nearest
+
+  # Block-index splits (9 interaction groups)
+#  branch0_indices: [[0,2],[2,5],[5,8],[8,11],[11,13],[13,15],[15,17],[17,19],[19,21],[21,24]]
+#  branch1_indices: [[0,3],[3,7],[7,11],[11,15],[15,19],[19,23],[23,27],[27,31],[31,35],[35,39]]
+#  branch2_indices: [[0,3],[3,7],[7,9],[9,11],[11,13],[13,14],[14,15],[15,16],[16,17],[17,21]]
+#  return_indices: [0, 1, 8, 9]
+#  branch0_dims: [112, 224, 448, 448, 448, 448, 448, 448, 448, 896]
+#  branch1_dims: [96, 192, 384, 384, 384, 384, 384, 384, 384, 768]
+#  branch2_dims: [96, 192, 384, 384, 384, 384, 384, 384, 384, 768]
+#  num_heads: [2, 4, 8, 8, 8, 8, 8, 8, 8, 16]

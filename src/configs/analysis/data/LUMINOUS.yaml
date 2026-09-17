@@ -1,0 +1,13 @@
+# LUMINOUS — image dataset (lung US, Canada; single category `b_line`).
+#
+# Test split = canonical project list (307 samples) from the v2 deduplicated
+# annotation dir, the same list the pretraining benchmark evaluates. Added for the evaluation-protocol
+# unification: this dataset had no Stage-1 record, so its paper numbers
+# came only from the pretraining harness.
+
+name: LUMINOUS
+kind: image
+saus_dir: ${scratch.dataset_dir}/LUMINOUS
+split_list_txt: ${scratch.annotation_dir}/LUMINOUS/test_list.txt
+image_ext: .jpg
+gt_ext: .json

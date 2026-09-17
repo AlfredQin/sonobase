@@ -1,0 +1,60 @@
+# Test/evaluation top-level config for sonobase.
+#
+# Composed Hydra defaults mirror train.yaml so model + data + metrics resolve
+# the same way the training run did. Only training-only stages are dropped:
+#   - no `optim:` group (no optimizer/scheduler is built)
+#   - no `step_scheduler` (no epoch loop, no checkpoint cadence)
+#   - `checkpoint.enabled: false` (the recipe forces this anyway)
+#
+# Usage:
+#   uv run torchrun --nproc-per-node=4 -m nemo_cv.recipes.sonobase.test \
+#     -c ./configs/pretrain -cn test \
+#     experiment=hiera_b_conv_s_conv_t_test_busi_camus_test \
+#     restore_from=./experiments/sonobase/pretrain/busi_camus/hiera_b_conv_s_conv_t/epoch_1_step_387
+
+defaults:
+  - scratch: default
+  - model@model: sam2_train
+  - loss@loss_fn: sam2          # optional during test; provides per-dataset test_loss
+  - metric@_global_: sam2_vos
+  - data: busi_camus_test
+  - experiment: null
+  - _self_
+
+recipe: nemo_cv.recipes.sonobase.test.TestSonobaseRecipe
+seed: ${scratch.seed}
+mode: test
+
+# REQUIRED override: path to a checkpoint dir produced by the training recipe
+# (must contain a `model/` subdir with DCP shards, e.g. epoch_1_step_387/).
+restore_from: ???
+
+dist_env:
+  backend: nccl
+  timeout_minutes: 10
+
+distributed:
+  # No backward pass during eval -> false is fine and faster.
+  find_unused_parameters: false
+
+cuda:
+  cudnn_deterministic: true
+  cudnn_benchmark: false        # variable input sizes across datasets
+  allow_tf32: false
+
+# AMP context for the forward pass (matches training default).
+optim:
+  amp:
+    enabled: true
+    amp_dtype: bfloat16
+
+# Test does not write checkpoints; we only reuse `save_dir` to know where to
+# put the results/ directory. The recipe forces enabled=false regardless.
+checkpoint:
+  enabled: false
+  save_dir: ./experiments/${scratch.experiment_name}
+  model_save_format: torch_save
+  save_consolidated: false
+
+logging:
+  log_freq: 10

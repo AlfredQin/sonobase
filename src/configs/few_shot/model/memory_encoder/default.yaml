@@ -1,0 +1,23 @@
+_target_: nemo_cv.components.models.sam2.modeling.memory_encoder.MemoryEncoder
+out_dim: 64
+position_encoding:
+  _target_: nemo_cv.components.models.sam2.modeling.position_encoding.PositionEmbeddingSine
+  num_pos_feats: 64
+  normalize: true
+  scale: null
+  temperature: 10000
+mask_downsampler:
+  _target_: nemo_cv.components.models.sam2.modeling.memory_encoder.MaskDownSampler
+  kernel_size: 3
+  stride: 2
+  padding: 1
+fuser:
+  _target_: nemo_cv.components.models.sam2.modeling.memory_encoder.Fuser
+  layer:
+    _target_: nemo_cv.components.models.sam2.modeling.memory_encoder.CXBlock
+    dim: 256
+    kernel_size: 7
+    padding: 3
+    layer_scale_init_value: 1e-6
+    use_dwconv: true
+  num_layers: 2

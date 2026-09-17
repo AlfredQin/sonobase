@@ -1,0 +1,8 @@
+# Fetus standard COCO triplet (9 classes: thalami, midbrain, palate,
+# fourth ventricle, cisterna magna, nuchal translucency, nasal tip,
+# nasal skin, nasal bone).
+_target_: nemo_cv.components.datasets.us_rfdetr.FetusDetDataModule
+
+data_root: ${scratch.dataset_dir}/Fetus/coco_detection
+image_size: ${scratch.image_size}
+multiplier: ${scratch.multiplier}

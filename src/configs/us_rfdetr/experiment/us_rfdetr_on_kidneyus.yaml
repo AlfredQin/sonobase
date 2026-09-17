@@ -1,0 +1,8 @@
+# @package _global_
+# US-RFDETR on KidneyUS (renal B-mode, 1 class: kidney).
+defaults:
+  - override /data_module: kidneyus
+
+scratch:
+  experiment_name: us_rfdetr/kidneyus
+  batch_size: 8

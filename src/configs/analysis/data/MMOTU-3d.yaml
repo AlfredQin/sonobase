@@ -1,0 +1,13 @@
+# MMOTU-3d — image dataset (3D ovarian tumour, China).
+#
+# Test split = canonical project list (153 samples) from the v2 deduplicated
+# annotation dir, the same list the pretraining benchmark evaluates. Added for the evaluation-protocol
+# unification: this dataset had no Stage-1 record, so its paper numbers
+# came only from the pretraining harness.
+
+name: MMOTU-3d
+kind: image
+saus_dir: ${scratch.dataset_dir}/MMOTU-3d
+split_list_txt: ${scratch.annotation_dir}/MMOTU-3d/test_list.txt
+image_ext: .jpg
+gt_ext: .json

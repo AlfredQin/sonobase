@@ -1,0 +1,13 @@
+# @package _global_
+# US-RFDETR backbone group: MedSAM2 — Hiera-Tiny trunk fine-tuned by
+# Bowang Lab on medical images (broad SAM2-Tiny + medical fine-tune,
+# not specifically ultrasound).
+
+defaults:
+  - override /model/image_encoder@model.image_encoder: hiera_t
+
+scratch:
+  backbone_name: medsam2
+
+model:
+  pretrained_ckpt: ${scratch.checkpoint_dir}/MedSAM2/MedSAM2_latest.pt

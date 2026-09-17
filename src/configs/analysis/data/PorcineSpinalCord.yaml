@@ -1,0 +1,15 @@
+# Porcine spinal cord — image dataset (one .jpg per sample).
+# 5-class semantic segmentation; B3 analysis reports per-class mIoU.
+
+# NOTE: split_list_txt intentionally lives under ${scratch.dataset_dir} (with the
+# data), NOT ${scratch.annotation_dir} like the 8 canonical benchmark configs.
+# PorcineSpinalCord is an eval-only analysis dataset — not part of the 38_pt_8_bm
+# pretrain mix nor the 38_pt_8_bm_7_ext_v2 canonical splits — so there is no
+# train/test-leak vector and no canonical split dir for it. Same convention as
+# MouseBrainTumor.yaml.
+name: PorcineSpinalCord
+kind: image
+saus_dir: ${scratch.dataset_dir}/PorcineSpinalCord
+split_list_txt: ${scratch.dataset_dir}/PorcineSpinalCord/test_list.txt
+image_ext: .jpg
+gt_ext: .json

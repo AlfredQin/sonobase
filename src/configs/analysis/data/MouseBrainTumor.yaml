@@ -1,0 +1,21 @@
+# MouseBrainTumor (GL261 glioblastoma) — video dataset.
+# Sparse-annotated mouse-brain-tumor ultrasound recordings; single `tumor`
+# class. Out-of-domain (mouse, not human) eval used by B2 (catastrophic
+# failure catalog) and T3.2 (sonobase failure analysis). It carries no
+# metadata beyond standard masks, so the default (empty) metadata loader applies.
+#
+# SaUS layout (sa-v):
+#   <saus_dir>/images/<video_id>/<frame:05d>.jpg
+#   <saus_dir>/gt/<video_id>_manual.json
+#
+# Eval-only: not part of the canonical 38_pt_8_bm_7_ext annotation splits,
+# so we use the raw SaUS test_list.txt (all 30 tumor recordings; the 8
+# non-tumor recordings have empty masks and were dropped at conversion).
+# Same convention as PorcineSpinalCord.
+
+name: MouseBrainTumor
+kind: video
+saus_dir: ${scratch.dataset_dir}/MouseBrainTumor
+split_list_txt: ${scratch.dataset_dir}/MouseBrainTumor/test_list.txt
+gt_suffix: _manual
+gt_ext: .json

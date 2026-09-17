@@ -1,0 +1,13 @@
+# BUS-BRA — image dataset (breast US, Brazil).
+#
+# Test split = canonical project list (1688 samples) from the v2 deduplicated
+# annotation dir, the same list the pretraining benchmark evaluates. Added for the evaluation-protocol
+# unification: this dataset had no Stage-1 record, so its paper numbers
+# came only from the pretraining harness.
+
+name: BUS-BRA
+kind: image
+saus_dir: ${scratch.dataset_dir}/BUS-BRA
+split_list_txt: ${scratch.annotation_dir}/BUS-BRA/test_list.txt
+image_ext: .jpg
+gt_ext: .json

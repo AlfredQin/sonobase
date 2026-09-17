@@ -1,0 +1,14 @@
+# CAMUS test split — 2D+t echocardiography (per-frame, per-view).
+#
+# SaUS layout:
+#   <saus_dir>/images/<video_id>/<frame:05d>.jpg     (e.g. patient0004_2CH/00000.jpg)
+#   <saus_dir>/gt/<video_id>_manual.json             (per-frame masklet, 3 categories)
+#
+# Categories (per dataset_info.json): id 1 = endocardium, 2 = epicardium, 3 = atrium_wall.
+
+name: CAMUS
+kind: video                          # one video (frame stack) per sample
+saus_dir: ${scratch.dataset_dir}/CAMUS
+split_list_txt: ${scratch.annotation_dir}/CAMUS/test_list.txt   # canonical project test split (leak-free vs pretrain)
+gt_suffix: _manual
+gt_ext: .json

@@ -1,0 +1,8 @@
+# @package _global_
+# US-RFDETR on Fetus (fetal-anatomy COCO triplet, 9 classes).
+defaults:
+  - override /data_module: fetus
+
+scratch:
+  experiment_name: us_rfdetr/fetus
+  batch_size: 4

@@ -1,0 +1,17 @@
+# @package _global_
+# SonoBase pretraining ablation — single Hiera-B+ encoder (the SAM2-Base+
+# trunk, no DINOv3 ConvNeXt branches) on the full 38 pretrain + 8 benchmark
+# mixture. Quantifies how much of the headline TriBranchTrunk gain comes
+# from US-specific pretraining vs from the multi-branch architecture.
+#
+# Usage:
+#   uv run torchrun --nproc_per_node=4 -m nemo_cv.recipes.sonobase.pretrain \
+#     -c ./configs/pretrain \
+#     experiment=pretrain_hiera_b+_on_38_pt_8_bm
+
+defaults:
+  - override /data: 38_pt_8_bm
+  - override /model/image_encoder@model.image_encoder: hiera_b+
+
+scratch:
+  experiment_name: sonobase/pretrain/38_pt_8_bm/hiera_b+

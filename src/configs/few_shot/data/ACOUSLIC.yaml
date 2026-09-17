@@ -1,0 +1,64 @@
+# ACOUSLIC few-shot training data.
+#
+# The same N samples must be used
+# across all 3 models at a given (dataset, N, seed). This is achieved by
+# pointing `file_list_txt` at our per-(dataset, N, seed) split file
+# (materialized by `nemo_cv.components.few_shot.splits.materialize_subset`
+# at recipe-setup time).
+#
+# Default `training_unit: video` → each training example is one annotated
+# video (JSONRawDataset). The recipe enforces N ≤ pool size; with the
+# canonical project split (`SaUS_Annotation/38_pt_8_bm_7_ext/ACOUSLIC/`)
+# the pool is 30 videos, so N=30 uses every training video.
+#
+# `training_unit: frame` is reserved for a follow-up — needs an
+# annotated-frame index built ahead of time; the recipe raises
+# NotImplementedError until that lands.
+
+name: ACOUSLIC
+kind: video
+batch_size: 1                                      # videos: 1 per step
+file_list_txt: ${scratch.splits_dir}/${scratch.subset_basename}.txt
+
+# ACOUSLIC train pool has 30 videos with 3..47 annotated frames each.
+# `RandomUniformSampler(num_frames=N)` requires every sampled video to
+# have ≥ N annotated frames, otherwise it raises and the dataset retries
+# 100× then crashes (UnboundLocalError on a downstream variable). At small
+# N (e.g. N=1) some seeds pick a 3-frame video, so we pin num_frames to
+# the train-pool minimum. SAM2 still learns multi-frame propagation —
+# just with shorter clips than pretrain's default 8.
+num_frames: 3
+sampler:
+  _target_: nemo_cv.components.datasets.sam2.vos_sampler.RandomUniformSampler
+  num_frames: ${data.num_frames}
+  max_num_objects: 20
+
+train_dataset:
+  _target_: nemo_cv.components.datasets.sam2.sam2_datasets.TorchTrainMixedDataset
+  phases_per_epoch: 1
+  batch_sizes:
+    - ${data.batch_size}
+  num_workers: ${scratch.num_workers}
+  shuffle: true
+  pin_memory: true
+  drop_last: false                                 # at small N we don't want to drop a partial batch
+  collate_fn:
+    _target_: nemo_cv.components.datasets.sam2.data_utils.collate_fn
+    _partial_: true
+    dict_key: all
+  datasets:
+    - _target_: nemo_cv.components.datasets.sam2.utils.RepeatFactorWrapper
+      dataset:
+        _target_: nemo_cv.components.datasets.sam2.utils.ConcatDataset
+        datasets:
+          - _target_: nemo_cv.components.datasets.sam2.vos_dataset.VOSDataset
+            training: true
+            transforms: ${scratch.fewshot_train_transforms}
+            multiplier: 1
+            video_dataset:
+              _target_: nemo_cv.components.datasets.sam2.vos_raw_dataset.JSONRawDataset
+              img_folder: ${scratch.dataset_dir}/ACOUSLIC/images
+              gt_folder: ${scratch.dataset_dir}/ACOUSLIC/gt
+              file_list_txt: ${data.file_list_txt}
+              ann_every: 1
+            sampler: ${data.sampler}

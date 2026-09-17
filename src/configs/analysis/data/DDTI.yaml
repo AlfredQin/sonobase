@@ -1,0 +1,12 @@
+# DDTI thyroid US — image dataset.
+#
+# Test split = canonical project list (566 samples), NOT the raw SaUS list
+# (which has 65). Always use the project-canonical list for evaluation
+# consistency across the paper.
+
+name: DDTI
+kind: image
+saus_dir: ${scratch.dataset_dir}/DDTI
+split_list_txt: ${scratch.annotation_dir}/DDTI/test_list.txt
+image_ext: .jpg
+gt_ext: .json

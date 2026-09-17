@@ -1,0 +1,102 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+.venv/
+venv/
+# No trailing slash: a venv symlinked from elsewhere is ignored too.
+.venv
+
+# Model checkpoints and large files
+*.pt
+*.pth
+*.bin
+*.safetensors
+*.ckpt
+*.h5
+*.hdf5
+*.onnx
+
+# Data (tracked via src/data/README.md)
+*.csv
+*.tsv
+*.parquet
+*.arrow
+*.npy
+*.npz
+*.pkl
+*.pickle
+*.tar.gz
+*.zip
+
+# LaTeX build artifacts
+paper/*.aux
+paper/*.bbl
+paper/*.blg
+paper/*.log
+paper/*.out
+paper/*.toc
+paper/*.fls
+paper/*.fdb_latexmk
+paper/*.synctex.gz
+paper/*.bcf
+paper/*.run.xml
+
+# IDE / OS
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+Thumbs.db
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Environment
+.env
+.envrc
+
+# Local editor / agent settings
+.claude/settings.local.json
+
+# External reference repos (cloned for comparison, never committed)
+external/
+
+# Stage-1 prediction dumps and pretraining output written under src/experiments/
+# by the run scripts: hundreds of GB of masks, overlays and per-sample json.
+# No trailing slash, so a symlink of the same name is ignored too.
+src/experiments/analysis/predictions
+src/experiments/analysis/predictions_prompt_noise
+src/experiments/analysis/predictions_click_curve
+src/experiments/sonobase
+
+# `*.csv` is ignored globally above as a data-file rule. The Stage-2 records are
+# the provenance of every reported number and are well under 10 MB, so keeping
+# them versioned turns a regeneration into a reviewable diff; re-include them.
+!src/experiments/analysis/**/*.csv
+
+# Rendered analysis figures — regenerable from the records they plot.
+src/experiments/analysis/**/*.pdf
+src/experiments/analysis/**/*.png
+
+# Raw experiment run output: per-step jsonl and Slurm logs. Curated results
+# belong in src/experiments/<YYYY-MM-DD_name>/ instead — notes, config and
+# per-cell metrics, committed deliberately.
+src/experiments/us_rfdetr_seg/
+src/experiments/us_rfdetr_lr1e-4/
+src/experiments/us_rfdetr_tables/
+src/slurm_logs/
+slurm_logs/
+
+# ...but the generated result tables inside a curated experiment dir ARE the
+# record. The blanket *.csv rule above would otherwise drop them silently.
+!src/experiments/*/tables/*.csv
+!src/experiments/*/results/*.csv

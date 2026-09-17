@@ -1,0 +1,8 @@
+# MMOTU-3d ovarian-tumor ultrasound detection (1 class: ovarian_lesion).
+_target_: nemo_cv.components.datasets.us_rfdetr.SaUSCocoDetDataModule
+
+data_root: ${scratch.dataset_dir}/MMOTU-3d
+annotation_dir: ${scratch.det_annotation_dir}/MMOTU-3d
+image_size: ${scratch.image_size}
+multiplier: ${scratch.multiplier}
+val_from_test: false

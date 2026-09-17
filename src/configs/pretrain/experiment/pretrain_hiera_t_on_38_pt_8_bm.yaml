@@ -1,0 +1,21 @@
+# @package _global_
+# SonoBase pretraining ablation — single Hiera-T encoder (SAM2-Tiny
+# trunk, the same architecture MedSAM2 was fine-tuned on) on the full 38
+# pretrain + 8 benchmark mixture. Provides the most direct comparison
+# point against MedSAM2 at the encoder level.
+#
+# Override scratch.ckpt_path to load the SAM2-Tiny release weights:
+#   scratch.ckpt_path=${CHECKPOINT_DIR}/SAM2/sam2.1_hiera_tiny.pt
+#
+# Usage:
+#   uv run torchrun --nproc_per_node=4 -m nemo_cv.recipes.sonobase.pretrain \
+#     -c ./configs/pretrain \
+#     experiment=pretrain_hiera_t_on_38_pt_8_bm \
+#     scratch.ckpt_path=${CHECKPOINT_DIR}/SAM2/sam2.1_hiera_tiny.pt
+
+defaults:
+  - override /data: 38_pt_8_bm
+  - override /model/image_encoder@model.image_encoder: hiera_t
+
+scratch:
+  experiment_name: sonobase/pretrain/38_pt_8_bm/hiera_t

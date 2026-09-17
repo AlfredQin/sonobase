@@ -1,0 +1,11 @@
+# FUGC fetal-organ detection.
+# Per-image multi-class detection — number of classes loaded from
+# dataset_info.json at instantiation time (recipe reads
+# data_module.num_classes and uses it for the model head).
+_target_: nemo_cv.components.datasets.us_rfdetr.SaUSCocoDetDataModule
+
+data_root: ${scratch.dataset_dir}/FUGC
+annotation_dir: ${scratch.det_annotation_dir}/FUGC
+image_size: ${scratch.image_size}
+multiplier: ${scratch.multiplier}
+val_from_test: false

@@ -1,0 +1,13 @@
+# KidneyUS — image dataset.
+#
+# Test split = canonical project list (419 samples). Per-image manufacturer
+# membership (used by S1 subgroup analysis) lives in 5 sibling sub-list
+# files at the same `${scratch.annotation_dir}/KidneyUS/test_mfr_*_list.txt`.
+# Stage 1 doesn't read those — only Stage-2 S1 does.
+
+name: KidneyUS
+kind: image
+saus_dir: ${scratch.dataset_dir}/KidneyUS
+split_list_txt: ${scratch.annotation_dir}/KidneyUS/test_list.txt
+image_ext: .jpg
+gt_ext: .json

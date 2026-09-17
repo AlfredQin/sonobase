@@ -1,0 +1,6 @@
+# @package _global_
+# Reusable model-only overlay: MedSAM2 (Hiera-Tiny).
+defaults:
+  - override /model/image_encoder@model.image_encoder: hiera_t
+
+model_label: medsam2

@@ -1,0 +1,43 @@
+# SAM2 model hyperparameters
+num_maskmem: 7
+image_size: ${scratch.resolution}
+sigmoid_scale_for_mem_enc: 20.0
+sigmoid_bias_for_mem_enc: -10.0
+use_mask_input_as_output_without_sam: true
+directly_add_no_mem_embed: true
+no_obj_embed_spatial: true
+use_high_res_features_in_sam: true
+multimask_output_in_sam: true
+iou_prediction_use_sigmoid: true
+use_obj_ptrs_in_encoder: true
+add_tpos_enc_to_obj_ptrs: true
+proj_tpos_enc_in_obj_ptrs: true
+use_signed_tpos_enc_to_obj_ptrs: true
+only_obj_ptrs_in_the_past_for_eval: true
+pred_obj_scores: true
+pred_obj_scores_mlp: true
+fixed_no_obj_ptr: true
+multimask_output_for_tracking: true
+use_multimask_token_for_obj_ptr: true
+multimask_min_pt_num: 0
+multimask_max_pt_num: 1
+use_mlp_for_obj_ptr_proj: true
+
+# Training-specific: point/box input and corrections
+prob_to_use_pt_input_for_train: 0.5
+prob_to_use_pt_input_for_eval: 1.0
+prob_to_use_box_input_for_train: 0.5
+prob_to_use_box_input_for_eval: 0.0
+prob_to_sample_from_gt_for_train: 0.1
+num_frames_to_correct_for_train: 2
+num_frames_to_correct_for_eval: 1
+rand_frames_to_correct_for_train: true
+add_all_frames_to_correct_as_cond: true
+num_init_cond_frames_for_train: 2
+rand_init_cond_frames_for_train: true
+num_correction_pt_per_frame: 7
+num_correction_pt_per_frame_val: 0
+use_act_ckpt_iterative_pt_sampling: false
+num_init_cond_frames_for_eval: 1
+forward_backbone_per_frame_for_eval: true
+seed: ${scratch.seed}

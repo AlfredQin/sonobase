@@ -1,0 +1,9 @@
+# BUS-BRA breast ultrasound detection
+# (2 classes: breast_nodule_benign, breast_nodule_malignant).
+_target_: nemo_cv.components.datasets.us_rfdetr.SaUSCocoDetDataModule
+
+data_root: ${scratch.dataset_dir}/BUS-BRA
+annotation_dir: ${scratch.det_annotation_dir}/BUS-BRA
+image_size: ${scratch.image_size}
+multiplier: ${scratch.multiplier}
+val_from_test: false

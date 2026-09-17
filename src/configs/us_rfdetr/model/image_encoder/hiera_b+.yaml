@@ -1,0 +1,27 @@
+# Standard SAM2-Base+ Hiera trunk (used by sam2_no_ft backbone).
+#
+# Differs from `src/configs/test_sam2/model/image_encoder/hiera_b+.yaml`
+# in two detection-required overrides:
+#   * scalp: 0                         (preserve the highest-stride FPN level)
+#   * fpn_top_down_levels: [0,1,2,3]   (run top-down propagation on every level)
+# Without these, the FPN returns only 2 of the 4 stride levels — RF-DETR's
+# deformable attention needs 3 (P3/P4/P5) and breaks otherwise.
+_target_: nemo_cv.components.models.sam2.modeling.backbones.image_encoder.ImageEncoder
+scalp: 0
+trunk:
+  _target_: nemo_cv.components.models.sam2.modeling.backbones.hieradet.Hiera
+  embed_dim: 112
+  num_heads: 2
+  drop_path_rate: 0.0
+neck:
+  _target_: nemo_cv.components.models.sam2.modeling.backbones.image_encoder.FpnNeck
+  position_encoding:
+    _target_: nemo_cv.components.models.sam2.modeling.position_encoding.PositionEmbeddingSine
+    num_pos_feats: 256
+    normalize: true
+    scale: null
+    temperature: 10000
+  d_model: 256
+  backbone_channel_list: [896, 448, 224, 112]
+  fpn_top_down_levels: [0, 1, 2, 3]
+  fpn_interp_model: nearest

@@ -1,0 +1,8 @@
+# @package _global_
+# US-RFDETR on CVA-Net (carotid video B-mode, 2 classes).
+defaults:
+  - override /data_module: cva_net
+
+scratch:
+  experiment_name: us_rfdetr/cva_net
+  batch_size: 2          # videos × small batch — CVA-Net images are larger after resize

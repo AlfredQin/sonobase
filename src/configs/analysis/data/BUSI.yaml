@@ -1,0 +1,14 @@
+# BUSI — image dataset (breast US).
+#
+# Test split = canonical project list (131 samples = 88 benign + 43
+# malignant). Normal images are excluded by design (no lesion to segment,
+# IoU/Dice undefined). Per-image pathology membership (used by S3
+# subgroup analysis) lives in sibling `test_pathology_*_list.txt` files
+# at the same annotation_dir.
+
+name: BUSI
+kind: image
+saus_dir: ${scratch.dataset_dir}/BUSI
+split_list_txt: ${scratch.annotation_dir}/BUSI/test_list.txt
+image_ext: .jpg
+gt_ext: .json

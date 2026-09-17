@@ -1,0 +1,47 @@
+# SAM2 optimizer: AdamW with layer decay and cosine schedule
+amp:
+  enabled: true
+  amp_dtype: bfloat16
+
+optimizer:
+  _target_: torch.optim.AdamW
+  _partial_: true
+  eps: 1.0e-7
+
+gradient_clip:
+  _target_: nemo_cv.components.optim.optimizer.GradientClipper
+  max_norm: 0.1
+  norm_type: 2
+
+param_group_modifiers:
+  - _target_: nemo_cv.components.optim.optimizer.layer_decay_param_modifier
+    _partial_: true
+    layer_decay_value: 0.9
+    apply_to: image_encoder.trunk
+    overrides:
+      - pattern: "*pos_embed*"
+        value: 1.0
+
+options:
+  lr:
+    - scheduler:
+        _target_: fvcore.common.param_scheduler.CosineParamScheduler
+        start_value: 5.0e-5
+        end_value: 5.0e-6
+    - scheduler:
+        _target_: fvcore.common.param_scheduler.CosineParamScheduler
+        start_value: 3.0e-5
+        end_value: 3.0e-6
+      param_names:
+        - "image_encoder.*"
+  weight_decay:
+    - scheduler:
+        _target_: fvcore.common.param_scheduler.ConstantParamScheduler
+        value: 0.1
+    - scheduler:
+        _target_: fvcore.common.param_scheduler.ConstantParamScheduler
+        value: 0.0
+      param_names:
+        - "*bias*"
+      module_cls_names:
+        - torch.nn.LayerNorm

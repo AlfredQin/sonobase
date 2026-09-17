@@ -1,0 +1,7 @@
+# @package _global_
+# Few-shot model overlay: SAM2 (no fine-tune baseline; Hiera-B+).
+defaults:
+  - override /model/image_encoder@model.image_encoder: hiera_b+
+
+scratch:
+  model_label: sam2_no_ft

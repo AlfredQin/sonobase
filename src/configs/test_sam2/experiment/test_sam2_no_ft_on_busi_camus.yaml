@@ -1,0 +1,16 @@
+# @package _global_
+# SAM2 (no fine-tune) smoke test on BUSI + CAMUS. Loads Meta's released
+# Hiera-B+ checkpoint and evaluates zero-shot.
+#
+# CLI (CHECKPOINT_DIR must be set in env — e.g. `export CHECKPOINT_DIR=$WORK/Checkpoints`):
+#   uv run torchrun --nproc-per-node=4 -m nemo_cv.recipes.benchmarks.test_sam2 \
+#     -c ./configs/test_sam2 -cn test \
+#     experiment=test_sam2_no_ft_on_busi_camus \
+#     ckpt_path=${CHECKPOINT_DIR}/SAM2/sam2.1_hiera_base_plus.pt
+
+defaults:
+  - override /model/image_encoder@model.image_encoder: hiera_b+
+  - override /data: busi_camus
+
+scratch:
+  experiment_name: benchmarks/busi_camus/sam2/p0

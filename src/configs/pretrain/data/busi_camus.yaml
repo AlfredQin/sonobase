@@ -1,0 +1,116 @@
+# BUSI + CAMUS — DEPRECATED 2-dataset smoke (superseded by 38_pt_8_bm).
+# Kept only for quick smoke tests. Train AND val `file_list_txt` point at
+# ${scratch.annotation_dir} (the dedup, train/test-disjoint canonical lists),
+# NOT raw ${scratch.dataset_dir}, so re-running this smoke cannot reintroduce
+# the train/test leak. Image/GT data still load from ${scratch.dataset_dir}.
+
+train:
+  _target_: nemo_cv.components.datasets.sam2.sam2_datasets.TorchTrainMixedDataset
+  phases_per_epoch: 1
+  batch_sizes:
+    - ${scratch.train_image_batch_size}
+    - ${scratch.train_video_batch_size}
+  num_workers: ${scratch.num_train_workers}
+  shuffle: true
+  pin_memory: true
+  drop_last: true
+  collate_fn:
+    _target_: nemo_cv.components.datasets.sam2.data_utils.collate_fn
+    _partial_: true
+    dict_key: all
+  worker_init_fn:
+    _target_: nemo_cv.components.training.utils.seed_worker
+    _partial_: true
+
+  datasets:
+    - _target_: nemo_cv.components.datasets.sam2.utils.RepeatFactorWrapper
+      dataset:
+        _target_: nemo_cv.components.datasets.sam2.utils.ConcatDataset
+        datasets:
+          - _target_: nemo_cv.components.datasets.sam2.vos_dataset.VOSDataset
+            training: true
+            transforms: ${scratch.train_transforms}
+            multiplier: 1
+            video_dataset:
+              _target_: nemo_cv.components.datasets.sam2.vos_raw_dataset.SaUSRawDataset
+              img_folder: ${scratch.dataset_dir}/BUSI/images
+              gt_folder: ${scratch.dataset_dir}/BUSI/gt
+              file_list_txt: ${scratch.annotation_dir}/BUSI/train_list.txt
+            sampler: ${scratch.train_image_sampler}
+
+    - _target_: nemo_cv.components.datasets.sam2.utils.RepeatFactorWrapper
+      dataset:
+        _target_: nemo_cv.components.datasets.sam2.utils.ConcatDataset
+        datasets:
+          - _target_: nemo_cv.components.datasets.sam2.vos_dataset.VOSDataset
+            training: true
+            transforms: ${scratch.train_transforms}
+            multiplier: 1
+            video_dataset:
+              _target_: nemo_cv.components.datasets.sam2.vos_raw_dataset.JSONRawDataset
+              img_folder: ${scratch.dataset_dir}/CAMUS/images
+              gt_folder: ${scratch.dataset_dir}/CAMUS/gt
+              file_list_txt: ${scratch.annotation_dir}/CAMUS/train_list.txt
+              ann_every: 1
+            sampler: ${scratch.train_video_sampler}
+
+val:
+  # Each key is a dataset name — separate loader for per-dataset metrics
+  BUSI:
+    _target_: nemo_cv.components.datasets.sam2.sam2_datasets.TorchTrainMixedDataset
+    phases_per_epoch: 1
+    batch_sizes:
+      - ${scratch.val_image_batch_size}
+    num_workers: ${scratch.num_train_workers}
+    shuffle: false
+    pin_memory: true
+    drop_last: false
+    collate_fn:
+      _target_: nemo_cv.components.datasets.sam2.data_utils.collate_fn
+      _partial_: true
+      dict_key: all
+    datasets:
+      - _target_: nemo_cv.components.datasets.sam2.utils.RepeatFactorWrapper
+        dataset:
+          _target_: nemo_cv.components.datasets.sam2.utils.ConcatDataset
+          datasets:
+            - _target_: nemo_cv.components.datasets.sam2.vos_dataset.VOSDataset
+              training: false
+              transforms: ${scratch.val_transforms}
+              multiplier: 1
+              video_dataset:
+                _target_: nemo_cv.components.datasets.sam2.vos_raw_dataset.SaUSRawDataset
+                img_folder: ${scratch.dataset_dir}/BUSI/images
+                gt_folder: ${scratch.dataset_dir}/BUSI/gt
+                file_list_txt: ${scratch.annotation_dir}/BUSI/val_list.txt
+              sampler: ${scratch.val_image_sampler}
+
+  CAMUS:
+    _target_: nemo_cv.components.datasets.sam2.sam2_datasets.TorchTrainMixedDataset
+    phases_per_epoch: 1
+    batch_sizes:
+      - ${scratch.val_video_batch_size}
+    num_workers: ${scratch.num_train_workers}
+    shuffle: false
+    pin_memory: true
+    drop_last: false
+    collate_fn:
+      _target_: nemo_cv.components.datasets.sam2.data_utils.collate_fn
+      _partial_: true
+      dict_key: all
+    datasets:
+      - _target_: nemo_cv.components.datasets.sam2.utils.RepeatFactorWrapper
+        dataset:
+          _target_: nemo_cv.components.datasets.sam2.utils.ConcatDataset
+          datasets:
+            - _target_: nemo_cv.components.datasets.sam2.vos_dataset.VOSDataset
+              training: false
+              transforms: ${scratch.val_transforms}
+              multiplier: 1
+              video_dataset:
+                _target_: nemo_cv.components.datasets.sam2.vos_raw_dataset.JSONRawDataset
+                img_folder: ${scratch.dataset_dir}/CAMUS/images
+                gt_folder: ${scratch.dataset_dir}/CAMUS/gt
+                file_list_txt: ${scratch.annotation_dir}/CAMUS/val_list.txt
+                ann_every: 1
+              sampler: ${scratch.val_video_sampler}

@@ -1,0 +1,17 @@
+# PFUS — video dataset (pelvic floor US; 6+ categories: pubis, urethra,
+# bladder, uterus, vagina, anus — multi-object per frame).
+#
+# SaUS layout:
+#   <saus_dir>/images/<sample_id>/<frame:05d>.jpg
+#   <saus_dir>/gt/<sample_id>_manual.json
+#
+# Test split = canonical project list (22 sequences) from the v2 deduplicated
+# annotation dir, the same list the pretraining benchmark evaluates. Prompted once and propagated,
+# matching the other video datasets in this pipeline. Added for the evaluation-protocol unification.
+
+name: PFUS
+kind: video
+saus_dir: ${scratch.dataset_dir}/PFUS
+split_list_txt: ${scratch.annotation_dir}/PFUS/test_list.txt
+gt_suffix: _manual
+gt_ext: .json

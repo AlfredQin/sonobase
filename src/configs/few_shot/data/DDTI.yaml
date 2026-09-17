@@ -1,0 +1,38 @@
+# DDTI few-shot training data.
+#
+# Image dataset (one .jpg + one .json per sample). Uses SaUSRawDataset.
+# Canonical training pool: 63 images at the annotation_dir.
+
+name: DDTI
+kind: image
+batch_size: 4                                       # images: batch_size = min(N, 4)
+file_list_txt: ${scratch.splits_dir}/${scratch.subset_basename}.txt
+
+train_dataset:
+  _target_: nemo_cv.components.datasets.sam2.sam2_datasets.TorchTrainMixedDataset
+  phases_per_epoch: 1
+  batch_sizes:
+    - ${data.batch_size}
+  num_workers: ${scratch.num_workers}
+  shuffle: true
+  pin_memory: true
+  drop_last: false
+  collate_fn:
+    _target_: nemo_cv.components.datasets.sam2.data_utils.collate_fn
+    _partial_: true
+    dict_key: all
+  datasets:
+    - _target_: nemo_cv.components.datasets.sam2.utils.RepeatFactorWrapper
+      dataset:
+        _target_: nemo_cv.components.datasets.sam2.utils.ConcatDataset
+        datasets:
+          - _target_: nemo_cv.components.datasets.sam2.vos_dataset.VOSDataset
+            training: true
+            transforms: ${scratch.fewshot_train_transforms}
+            multiplier: 1
+            video_dataset:
+              _target_: nemo_cv.components.datasets.sam2.vos_raw_dataset.SaUSRawDataset
+              img_folder: ${scratch.dataset_dir}/DDTI/images
+              gt_folder: ${scratch.dataset_dir}/DDTI/gt
+              file_list_txt: ${data.file_list_txt}
+            sampler: ${scratch.train_image_sampler}

@@ -1,0 +1,31 @@
+# Conda environment for SonoBase
+# Usage: conda env create -f environment.yml
+# Update: conda env update -f environment.yml --prune
+#
+# IMPORTANT: When you install a new package, add it here immediately.
+# Never install something and forget to record it.
+# Pin versions for reproducibility (e.g., numpy=1.24.3, not just numpy).
+
+name: sonobase
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - python=3.11
+  - pip
+  # --- Core scientific stack ---
+  - numpy
+  - pandas
+  - scipy
+  - matplotlib
+  - seaborn
+  # --- Deep learning (uncomment what you need) ---
+  # - pytorch
+  # - torchvision
+  # - torchaudio
+  # --- Jupyter ---
+  - jupyterlab
+  # --- Pip-only packages ---
+  - pip:
+    - tqdm
+    # Add pip packages here

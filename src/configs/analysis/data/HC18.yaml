@@ -1,0 +1,17 @@
+# HC18 (Head Circumference) test split for Stage-1 prediction-saving.
+#
+# This is a deliberately MINIMAL data config — Stage 1 doesn't use the
+# heavy `TorchTrainMixedDataset` machinery from training. It just needs the
+# paths needed to enumerate test samples; the recipe loads images and GT
+# masks one at a time.
+#
+# Per-image pixel spacing and GT head circumference (mm) live in
+# `training_set_pixel_size_and_HC.csv` inside `${scratch.hc18_raw_zip}` and
+# are loaded by the Stage-2 metadata loader, NOT here.
+
+name: HC18
+kind: image                          # one image per sample (vs "video")
+saus_dir: ${scratch.dataset_dir}/HC18
+split_list_txt: ${scratch.annotation_dir}/HC18/test_list.txt   # canonical project test split (leak-free vs pretrain)
+image_ext: .jpg                      # SaUS-formatted HC18 uses .jpg
+gt_ext: .json                        # SA-1B style RLE annotation

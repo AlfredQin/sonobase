@@ -1,0 +1,40 @@
+# Project-wide variables for the analysis suite.
+#
+# Mirrors the role of `scratch/default.yaml` in the pretrain / test_sam2
+# trees. Anything an experiment yaml or shell script might want to override
+# lives here under `${scratch.<key>}`.
+
+resolution: 1024     # SAM2 native input size; image predictor handles its own resizing
+seed: 42
+
+# Dataset roots — DATASET_DIR and ANNOTATION_DIR must be set in env, e.g.:
+#   export DATASET_DIR=$WORK/Dataset/SaUS
+#   export ANNOTATION_DIR=$WORK/Dataset/SaUS_Annotation/35_pt_8_bm_7_ext_dedup
+# OmegaConf raises if these are unset at resolve time.
+dataset_dir: ${oc.env:DATASET_DIR}
+annotation_dir: ${oc.env:ANNOTATION_DIR}
+
+# Raw dataset zips (used only by Stage-2 metadata loaders to enrich the
+# per_sample CSV with clinical-grade metadata: pixel spacing, GT clinical
+# value, image quality, etc.). Stage 1 itself doesn't need any of these.
+# The `,null` defaults below keep an unset var from blocking unrelated runs
+# (e.g. Stage-1 prediction); the Stage-2 analysis that consumes one still
+# needs its env var set, e.g.:
+#   export HC18_ZIP=$WORK/Dataset/UltraSound/Raw/HC.zip
+#   export CAMUS_ZIP=$WORK/Dataset/UltraSound/Raw/CAMUS.zip
+#   export REGPRO_ZIP=$WORK/Dataset/UltraSound/Raw/RegPro.zip
+#   export ACOUSLIC_CSV=$WORK/Dataset/UltraSound/ACOUSLIC/circumferences/fetal_abdominal_circumferences_per_sweep.csv
+hc18_raw_zip: ${oc.env:HC18_ZIP,null}
+camus_raw_zip: ${oc.env:CAMUS_ZIP,null}
+regpro_raw_zip: ${oc.env:REGPRO_ZIP,null}
+acouslic_csv_path: ${oc.env:ACOUSLIC_CSV,null}
+
+# Default experiment name; per-experiment overlays override this.
+experiment_name: analysis/_default
+
+# Inherited from test_sam2/model/sam2.yaml interpolations. Unused at Stage 1
+# because analysis uses SAM2ImagePredictor (explicit prompts) rather than
+# the training-style val pass — but they need to resolve for the model to
+# instantiate. Held at 0 (the SAM2Base defaults) on purpose.
+num_correction_pt_per_frame_val: 0
+prob_to_use_box_input_for_eval: 0

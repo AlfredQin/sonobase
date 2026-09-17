@@ -1,0 +1,14 @@
+# @package _global_
+# Sonobase test experiment: TriBranchTrunk evaluated on the 8 benchmark + 7
+# external test splits (15 datasets total). This is the real downstream-eval
+# target — point `restore_from` at the final pretraining checkpoint when ready.
+
+defaults:
+  - override /data: 8_bm_7_ext
+
+scratch:
+  experiment_name: sonobase/test/8_bm_7_ext/hiera_b_conv_s_conv_t
+
+model:
+  num_correction_pt_per_frame_val: 0  # 0 ~ 7, 0 = no correction
+  prob_to_use_box_input_for_eval: 0  # 0 means using point prompt, while 1 means using box prompt

@@ -1,0 +1,74 @@
+# Top-level Hydra config for few-shot decoder-only fine-tuning.
+#
+# Single-GPU. Reuses the existing pretrain stack:
+#   * `SAM2Train.forward()` for the forward pass
+#   * `MultiStepMultiMasksAndIous` for the loss
+#   * `SaUSRawDataset` / `JSONRawDataset` + `collate_fn` for data
+# The recipe adds ONLY:
+#   * deterministic subset selection (writes a custom `file_list_txt`)
+#   * encoder freeze
+#   * single-GPU AdamW + cosine LR + N-aware epoch count + grad clip
+#
+# REQUIRED CLI overrides:
+#   data=<DATASET>             ACOUSLIC | DDTI | FUGC
+#   ckpt_path=<.pt path>       base checkpoint to fine-tune
+#   scratch.dataset_name=<...> matches `data.name`
+#   scratch.model_label=<...>  sonobase | medsam2 | sam2_no_ft
+#   scratch.N=<int>            1 | 2 | 5 | 10 | 20 | 30
+#   scratch.fewshot_seed=<int> 42 | 123 | 456
+
+defaults:
+  - scratch: default
+  - model@model: sam2
+  - loss@loss_fn: sam2
+  - data: null
+  - experiment: null
+  - _self_
+
+recipe: nemo_cv.recipes.few_shot.finetune.FewShotFinetuneRecipe
+seed: ${scratch.seed}
+
+# Required: where to start from (the .pt checkpoint to fine-tune).
+ckpt_path: ???
+
+# Output root — the recipe writes:
+#   <output_root>/checkpoints/<experiment_name>/final.pth
+#   <output_root>/logs/<experiment_name>.log
+output_root: ./experiments/few_shot
+
+# N-dependent epoch count. Values resolved at runtime in the recipe
+# (Hydra can't conditionally pick by N).
+epoch_schedule:
+  small: {N_max: 5, epochs: 50}
+  medium: {N_max: 20, epochs: 30}
+  large: {N_max: 100, epochs: 20}
+
+# Per-module freeze. A frozen module's parameters are excluded from the
+# optimizer (the module still runs in forward()). The few-shot protocol
+# fine-tunes the mask decoder + prompt encoder; the image + memory
+# encoders stay frozen. Submodules
+# outside this list (memory_attention, obj-ptr projections, bare SAM2
+# parameters) are always frozen.
+freeze:
+  image_encoder: true
+  mask_decoder: false
+  memory_encoder: true
+  prompt_encoder: false   # trainable: the few-shot protocol fine-tunes the prompt encoder
+
+# AdamW + cosine LR.
+optim:
+  lr: 1.0e-4
+  weight_decay: 0.01
+  cosine_min_lr: 0.0
+  grad_clip_norm: 1.0
+  amp:
+    enabled: true
+    amp_dtype: bfloat16
+
+cuda:
+  cudnn_deterministic: false                       # bit-determinism not required
+  cudnn_benchmark: true
+  allow_tf32: false
+
+logging:
+  log_freq: 5

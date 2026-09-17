@@ -1,0 +1,57 @@
+# Top-level config for the SAM2 / MedSAM2 / Sonobase benchmark comparison.
+#
+# Used by the recipe at `nemo_cv.recipes.benchmarks.test_sam2`.
+#
+# Usage (CHECKPOINT_DIR must be set in env — e.g. `export CHECKPOINT_DIR=$WORK/Checkpoints`):
+#   uv run torchrun --nproc-per-node=4 -m nemo_cv.recipes.benchmarks.test_sam2 \
+#     -c ./configs/test_sam2 -cn test \
+#     experiment=test_sam2_no_ft_on_8_bm_7_ext \
+#     ckpt_path=${CHECKPOINT_DIR}/SAM2/sam2.1_hiera_base_plus.pt
+
+defaults:
+  - scratch: default
+  - model@model: sam2
+  - loss@loss_fn: sam2          # optional during test; provides per-dataset test_loss
+  - metric@_global_: sam2_vos
+  - data: 8_bm_7_ext
+  - experiment: null
+  - _self_
+
+recipe: nemo_cv.recipes.benchmarks.test_sam2.TestSam2BenchmarkRecipe
+seed: ${scratch.seed}
+mode: test
+
+# REQUIRED override: path to a single `.pt` checkpoint file. SAM2 and MedSAM2
+# release `.pt` files directly; sonobase's DCP-format pretraining checkpoint
+# must be converted via `convert_sonobase_dcp_to_pt.py` first.
+ckpt_path: ???
+
+dist_env:
+  backend: nccl
+  timeout_minutes: 10
+
+distributed:
+  # No backward pass during eval -> false is fine and faster.
+  find_unused_parameters: false
+
+cuda:
+  cudnn_deterministic: true
+  cudnn_benchmark: false        # variable input sizes across datasets
+  allow_tf32: false
+
+# AMP context for the forward pass (matches training default).
+optim:
+  amp:
+    enabled: true
+    amp_dtype: bfloat16
+
+# Test does not write checkpoints; we only reuse `save_dir` to know where to
+# put the results/ directory. The recipe forces enabled=false regardless.
+checkpoint:
+  enabled: false
+  save_dir: ./experiments/${scratch.experiment_name}
+  model_save_format: torch_save
+  save_consolidated: false
+
+logging:
+  log_freq: 10

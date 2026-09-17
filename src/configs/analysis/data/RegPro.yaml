@@ -1,0 +1,13 @@
+# RegPro (Prostate-MRI-Ultrasound-Registration) — 3D volumes treated as
+# per-slice 2.5D videos. The "video" model gives us per-slice masks; the
+# C2 prostate-volume analysis sums voxels × voxel_size_mm³.
+#
+# Voxel spacing is per-case in the raw RegPro metadata; the C2 analysis
+# loads it via metadata_loaders/regpro.py.
+
+name: RegPro
+kind: video                          # treat 3D as a slice-stack "video"
+saus_dir: ${scratch.dataset_dir}/RegPro
+split_list_txt: ${scratch.annotation_dir}/RegPro/test_list.txt   # canonical project test split (leak-free vs pretrain)
+gt_suffix: _manual
+gt_ext: .json

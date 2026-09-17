@@ -1,0 +1,11 @@
+# FUGC fetal US — image dataset.
+#
+# Test split = canonical project list (396 samples). The raw SaUS dir
+# doesn't ship a test_list.txt at all; this canonical list is required.
+
+name: FUGC
+kind: image
+saus_dir: ${scratch.dataset_dir}/FUGC
+split_list_txt: ${scratch.annotation_dir}/FUGC/test_list.txt
+image_ext: .jpg
+gt_ext: .json

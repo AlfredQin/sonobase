@@ -1,0 +1,9 @@
+# @package _global_
+# US-RFDETR on FUGC (fetal-organ detection, multi-class — count loaded
+# from dataset_info.json by the data module at instantiation time).
+defaults:
+  - override /data_module: fugc
+
+scratch:
+  experiment_name: us_rfdetr/fugc
+  batch_size: 8

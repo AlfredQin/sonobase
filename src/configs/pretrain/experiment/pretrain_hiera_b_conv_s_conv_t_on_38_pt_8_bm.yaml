@@ -1,0 +1,22 @@
+# @package _global_
+# Production SonoBase pretraining — TriBranchTrunk (Hiera-B + ConvNeXt-S +
+# ConvNeXt-T) on the full 38 pretrain + 8 benchmark data mixture (46
+# datasets total: 11 video + 35 image). This is the *primary* sonobase
+# pretraining target — the headline encoder we benchmark against
+# SAM2-no-ft and MedSAM2 (see scripts/benchmarks/test_sam2/).
+#
+# Usage (from src/):
+#   bash scripts/pretrain/pretrain_hiera_b_conv_s_conv_t_on_38_pt_8_bm.sh
+#
+# Or directly:
+#   uv run torchrun --nproc_per_node=4 -m nemo_cv.recipes.sonobase.pretrain \
+#     -c ./configs/pretrain \
+#     experiment=pretrain_hiera_b_conv_s_conv_t_on_38_pt_8_bm \
+#     step_scheduler.global_batch_size=4
+
+defaults:
+  - override /data: 38_pt_8_bm
+  - override /model/image_encoder@model.image_encoder: hiera_b_conv_s_conv_t
+
+scratch:
+  experiment_name: sonobase/pretrain/38_pt_8_bm/hiera_b_conv_s_conv_t

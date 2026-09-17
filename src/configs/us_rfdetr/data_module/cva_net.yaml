@@ -1,0 +1,9 @@
+# CVA-Net video detection (2 classes: benign, malignant).
+# Train/val split is video-level (deterministic seeded shuffle); test
+# split is the canonical CVA-Net `test.json`.
+_target_: nemo_cv.components.datasets.us_rfdetr.CVANetDataModule
+
+data_root: ${scratch.dataset_dir}/CVA_Net
+image_size: ${scratch.image_size}
+val_ratio: 0.15
+seed: ${scratch.seed}

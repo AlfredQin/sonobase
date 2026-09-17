@@ -1,0 +1,11 @@
+# @package _global_
+# Sonobase test experiment: TriBranchTrunk evaluated on the BUSI + CAMUS test
+# splits. Used as the smoke target for the test recipe (matches the pretraining
+# data of the existing checkpoint at
+# experiments/sonobase/pretrain/busi_camus/hiera_b_conv_s_conv_t/epoch_1_step_387).
+
+defaults:
+  - override /data: busi_camus
+
+scratch:
+  experiment_name: benchmarks/busi_camus/hiera_b_conv_s_conv_t/p0

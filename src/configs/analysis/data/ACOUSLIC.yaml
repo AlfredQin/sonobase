@@ -1,0 +1,18 @@
+# ACOUSLIC-AI test split — fetal abdominal sweep videos.
+#
+# SaUS layout:
+#   <saus_dir>/images/<video_id>/<frame:05d>.jpg
+#   <saus_dir>/gt/<video_id>_manual.json
+#
+# Per-image pixel spacing is 0.28 mm/px isotropic (MHA header). Ground-truth
+# circumferences must come from the Zenodo v1.1 release; the v1.0 file is 2x
+# too large. No spacing calibration is needed or allowed.
+#
+# Test split = canonical project list (270 videos), NOT the raw SaUS list.
+
+name: ACOUSLIC
+kind: video
+saus_dir: ${scratch.dataset_dir}/ACOUSLIC
+split_list_txt: ${scratch.annotation_dir}/ACOUSLIC/test_list.txt
+gt_suffix: _manual
+gt_ext: .json

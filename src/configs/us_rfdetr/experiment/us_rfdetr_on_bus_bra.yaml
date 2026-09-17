@@ -1,0 +1,8 @@
+# @package _global_
+# US-RFDETR on BUS-BRA (breast B-mode, 2 classes: benign / malignant).
+defaults:
+  - override /data_module: bus_bra
+
+scratch:
+  experiment_name: us_rfdetr/bus_bra
+  batch_size: 8

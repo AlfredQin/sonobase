@@ -1,0 +1,13 @@
+# SAM2Train model config — composes sub-components via Hydra defaults
+defaults:
+  - default
+  - image_encoder@image_encoder: hiera_b_conv_s_conv_t
+  - memory_attention@memory_attention: default
+  - memory_encoder@memory_encoder: default
+
+_target_: nemo_cv.components.models.sam2.sam2_train.SAM2Train
+
+num_correction_pt_per_frame_val: ${scratch.num_correction_pt_per_frame_val}  # 0 ~ 7, 0 = no correction
+prob_to_use_box_input_for_eval: ${scratch.prob_to_use_box_input_for_eval}  # 0 means using point prompt, while 1 means using box prompt
+
+

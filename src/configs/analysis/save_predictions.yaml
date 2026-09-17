@@ -1,0 +1,83 @@
+# Top-level Hydra config for Stage 1: prediction saving.
+#
+# Single-GPU inference; produces per-sample mask PNGs, meta.json, prompts.json,
+# overlay PNGs (optional), a per-(model × dataset × prompt) manifest.json, and
+# the canonical `per_sample_metrics.csv` that every Stage-2 analysis consumes.
+#
+# Usage (from src/) — normally launched via scripts/analysis/save_predictions/_save_one.sh:
+#   uv run python -m nemo_cv.recipes.analysis.save_predictions \
+#     -c ./configs/analysis -cn save_predictions \
+#     data=HC18 experiment=sonobase prompt_protocol.type=point \
+#     ckpt_path=<.pt path> run_name=sonobase_HC18_point_0corr \
+#     output_dir=./experiments/analysis/predictions/sonobase_HC18_point_0corr
+
+defaults:
+  - scratch: default
+  - model@model: sam2
+  - data: HC18
+  - experiment: null
+  - _self_
+
+recipe: nemo_cv.recipes.analysis.save_predictions.SavePredictionsRecipe
+seed: ${scratch.seed}
+
+# REQUIRED override: path to the .pt checkpoint to evaluate.
+ckpt_path: ???
+
+# REQUIRED override: where the per-sample artifacts go.
+output_dir: ???
+
+# Identifier for this run (becomes part of run_name in manifest.json).
+# Override per-experiment to encode (model, dataset, prompt protocol).
+run_name: ???
+
+# Free-form model label saved into per_sample_metrics.csv (e.g. sam2_no_ft).
+# Used by Stage-2 analyses to name the column for this model.
+model_label: ???
+
+# Prompt protocol controls how the recipe derives prompts from GT masks.
+prompt_protocol:
+  type: point                # "point" | "box"
+  num_correction_clicks: 0   # 0..7; iterative refinement after the initial prompt
+  box_jitter_pct: 0          # only used when type=box. Perturbs each corner by up to
+                             # min(side*pct, 20px) -- the same noise model as SAM2's own
+                             # sample_box_points. 0 = exact tight box (every published run).
+                             # Draws from a stream seeded by `seed`, so >0 stays reproducible.
+  multimask_output: true     # ask the decoder for 3 candidates and keep the highest
+                             # predicted-IoU one. false = single mask, which is what the
+                             # pretraining harness effectively does for a box (it encodes
+                             # a box as 2 points and multimask_max_pt_num=1 gates it off).
+  point_sampling: center     # only used when type=point. "center" = RITM distance-transform
+                             # maximum (deterministic; every published run). "uniform" = one
+                             # pixel drawn uniformly from the GT foreground -- what SAM2
+                             # trains with, and a better model of a real click.
+  seed: null                 # prompt-stream seed. null -> falls back to the global `seed`,
+                             # so every pre-existing run reproduces byte-for-byte. Set it to
+                             # vary prompts across replicates while holding the model fixed.
+
+# Toggle overlay PNG generation. Cheap to render; adds inspectability.
+save_overlays: true
+
+# Also score on a square 1024x1024 grid and record it in `iou_sq1024` /
+# `dice_sq1024` (scoring-grid ablation). The native-resolution `iou` / `dice`
+# columns are unaffected -- this only adds columns. That square grid is what the
+# pretraining harness measures on, because its val transform resizes the GT with
+# `RandomResizeAPI(sizes=1024, square=True)` before the metric sees it.
+score_square_grid: false
+
+# Limit number of samples processed (for fast smoke tests). null = all samples.
+max_samples: null
+
+cuda:
+  cudnn_deterministic: true
+  cudnn_benchmark: false
+  allow_tf32: false
+
+# AMP context for the forward pass (bf16 by default, matches training/test).
+optim:
+  amp:
+    enabled: true
+    amp_dtype: bfloat16
+
+logging:
+  log_freq: 20    # log every N samples

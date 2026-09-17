@@ -1,0 +1,48 @@
+defaults:
+  - scratch: default
+  - model@model: sam2_train
+  - loss@loss_fn: sam2
+  - optim@optim: sam2
+  - metric@_global_: sam2_vos
+  - data: 38_pt_8_bm
+  - experiment: null
+  - _self_
+
+recipe: nemo_cv.recipes.sonobase.pretrain.TrainSonobaseRecipe
+seed: ${scratch.seed}
+mode: train
+max_epochs: ${scratch.num_epochs}
+pretrained_ckpt_path: ${scratch.ckpt_path}
+val_epoch_freq: 1
+
+step_scheduler:
+  global_batch_size: 4
+  local_batch_size: 1
+  num_epochs: ${scratch.num_epochs}
+  ckpt_every_steps: null
+  val_every_steps: null
+  save_checkpoint_every_epoch: true
+
+dist_env:
+  backend: nccl
+  timeout_minutes: 10
+
+distributed:
+  find_unused_parameters: true
+
+cuda:
+  cudnn_deterministic: false
+  cudnn_benchmark: true
+  allow_tf32: false
+
+checkpoint:
+  enabled: true
+  save_dir: ./experiments/${scratch.experiment_name}
+  model_save_format: torch_save
+  save_consolidated: false
+
+#wandb:
+
+
+logging:
+  log_freq: 10

@@ -1,0 +1,65 @@
+# Top-level config for US-RFDETR test (eval-only) on a saved checkpoint.
+#
+# Identical defaults to `train.yaml` (so the recipe's setup() builds the
+# same model + data + metric infrastructure), but adds a required
+# `ckpt_path` that the test recipe uses to load `best.pt` (or any other
+# single-file `.pt` produced by training).
+#
+# Usage (single-GPU is the typical case):
+#
+#   uv run torchrun --nproc_per_node=1 -m nemo_cv.recipes.us_rfdetr.test \
+#     -c ./configs/us_rfdetr -cn test \
+#     experiment=us_rfdetr_on_acouslic backbone=sonobase \
+#     ckpt_path=./experiments/us_rfdetr/acouslic/sonobase/checkpoints/best.pt
+
+defaults:
+  - scratch: default
+  - model: rf_detr
+  - data_module: ddti
+  - experiment: null
+  - backbone: null
+  - _self_
+
+seed: ${scratch.seed}
+
+# REQUIRED — set on CLI to the trained `best.pt`.
+ckpt_path: ???
+
+dist_env:
+  backend: nccl
+  timeout_minutes: 30
+
+distributed:
+  find_unused_parameters: true
+  static_graph: false              # see train.yaml — needed by segmentation_head
+
+cuda:
+  cudnn_deterministic: true
+  cudnn_benchmark: false
+  allow_tf32: false
+
+trainer:
+  max_epochs: 0                    # not used at eval, but read by setup()
+  gradient_clip_val: 0.1
+
+optim:
+  lr: 1e-4
+  lr_encoder: 1e-5
+  weight_decay: 0.1
+  warmup_epochs: 0.0
+  lr_min: 1e-6
+  warmup_lr_init: 1e-6
+  amp:
+    enabled: true
+    amp_dtype: bfloat16
+
+eval:
+  score_threshold: 0.3             # FIX(E3): match old DenseUS eval protocol (was 0.0)
+
+checkpoint:
+  enabled: false                   # test never writes new checkpoints
+  save_dir: ./experiments/${scratch.experiment_name}/${scratch.backbone_name}
+  model_save_format: torch_save
+
+logging:
+  log_freq: 10

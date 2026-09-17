@@ -1,0 +1,6 @@
+# @package _global_
+# Reusable model-only overlay: SAM2 (no fine-tune; Hiera-B+).
+defaults:
+  - override /model/image_encoder@model.image_encoder: hiera_b+
+
+model_label: sam2_no_ft

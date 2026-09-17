@@ -1,0 +1,68 @@
+# Top-level config for US-RFDETR per-dataset detector training.
+#
+# Selects an `experiment` overlay (which fixes the dataset) and a
+# `backbone` overlay (which fixes the encoder + pretrained weights).
+# The two groups are orthogonal.
+#
+# Usage (set CHECKPOINT_DIR / DATASET_DIR / DET_ANNOTATION_DIR in your
+# environment first):
+#
+#   uv run torchrun --nproc_per_node=4 -m nemo_cv.recipes.us_rfdetr.train \
+#     -c ./configs/us_rfdetr -cn train \
+#     experiment=us_rfdetr_on_acouslic backbone=sonobase \
+#     model.pretrained_ckpt=./experiments/sonobase/.../LOWEST_VAL.pt
+#
+#   uv run torchrun --nproc_per_node=4 -m nemo_cv.recipes.us_rfdetr.train \
+#     -c ./configs/us_rfdetr -cn train \
+#     experiment=us_rfdetr_on_ddti backbone=sam2_no_ft
+
+defaults:
+  - scratch: default
+  - model: rf_detr
+  - data_module: ddti              # default; overridden by `experiment=`
+  - experiment: null               # opt-in dataset selector
+  - backbone: null                 # opt-in backbone selector
+  - _self_
+
+seed: ${scratch.seed}
+
+dist_env:
+  backend: nccl
+  timeout_minutes: 30
+
+distributed:
+  find_unused_parameters: true     # group-DETR has unused queries
+  static_graph: false              # set true with model.segmentation_head=true:
+                                   # the seg head runs twice per forward, which
+                                   # find_unused_parameters cannot handle
+
+cuda:
+  cudnn_deterministic: false
+  cudnn_benchmark: true            # detection has fairly stable input shapes
+  allow_tf32: false
+
+trainer:
+  max_epochs: 24
+  gradient_clip_val: 0.1
+
+optim:
+  lr: 3e-4                         # FIX(E3): match old DenseUS recipe (was 1e-4)
+  lr_encoder: 1e-4                 # FIX(E3): match old DenseUS recipe (was 1e-5); confirmed to lift sonobase
+  weight_decay: 0.1
+  warmup_epochs: 0.0
+  lr_min: 1e-5                     # FIX(E3): match old (was 1e-6)
+  warmup_lr_init: 1e-5             # FIX(E3): match old (was 1e-6)
+  amp:
+    enabled: true
+    amp_dtype: bfloat16
+
+eval:
+  score_threshold: 0.3             # FIX(E3): match old DenseUS eval protocol (was 0.0)
+
+checkpoint:
+  enabled: true
+  save_dir: ./experiments/${scratch.experiment_name}/${scratch.backbone_name}
+  model_save_format: torch_save
+
+logging:
+  log_freq: 10

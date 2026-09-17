@@ -1,0 +1,13 @@
+# TG3K — image dataset (thyroid gland).
+#
+# Test split = canonical project list (718 samples) from the v2 deduplicated
+# annotation dir, the same list the pretraining benchmark evaluates. Added for the evaluation-protocol
+# unification: this dataset had no Stage-1 record, so its paper numbers
+# came only from the pretraining harness.
+
+name: TG3K
+kind: image
+saus_dir: ${scratch.dataset_dir}/TG3K
+split_list_txt: ${scratch.annotation_dir}/TG3K/test_list.txt
+image_ext: .jpg
+gt_ext: .json

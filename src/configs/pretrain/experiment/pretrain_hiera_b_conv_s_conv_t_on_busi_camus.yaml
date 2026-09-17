@@ -1,0 +1,20 @@
+
+# @package _global_
+# SonoBase smoke pretraining: TriBranchTrunk encoder on the busi_camus mixture.
+# Used as a fast plumbing test for the recipe before the production
+# 38_pt_8_bm sweep — not a quality run.
+#
+# Usage:
+#   bash scripts/pretrain/pretrain_sonobase_on_sonocorpus.sh
+#   # or directly:
+#   uv run torchrun --nproc_per_node=4 -m nemo_cv.recipes.sonobase.pretrain \
+#     -c configs/pretrain -cn train \
+#     experiment=pretrain_hiera_b_conv_s_conv_t_on_busi_camus
+
+defaults:
+  - override /data: busi_camus
+
+scratch:
+  experiment_name: sonobase/pretrain/busi_camus/hiera_b_conv_s_conv_t
+  num_epochs: 10
+

@@ -1,0 +1,12 @@
+# SAM2 VOS validation metrics
+val_metrics:
+  miou:
+    _target_: nemo_cv.components.metrics.segmentation.Sam2VOSMeanIoU
+    num_classes: 2
+    include_background: false
+    input_format: index
+  dice:
+    _target_: nemo_cv.components.metrics.segmentation.Sam2VOSDiceScore
+    num_classes: 2
+    include_background: false
+    input_format: index

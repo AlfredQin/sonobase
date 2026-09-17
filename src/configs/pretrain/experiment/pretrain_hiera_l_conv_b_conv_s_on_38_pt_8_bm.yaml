@@ -1,0 +1,21 @@
+# @package _global_
+# SonoBase pretraining — TriBranchTrunk variant scaled up: Hiera-L +
+# ConvNeXt-B + ConvNeXt-S, on the full 38 pretrain + 8 benchmark mixture.
+# Larger-capacity encoder ablation against the default
+# Hiera-B + ConvNeXt-S + ConvNeXt-T trunk. Branch0 is initialised from
+# the SAM2 Hiera-Large release weights (override
+# `scratch.ckpt_path=${CHECKPOINT_DIR}/SAM2/sam2.1_hiera_large.pt` on
+# the CLI, since the default scratch.ckpt_path points at Hiera-B+).
+#
+# Usage:
+#   uv run torchrun --nproc_per_node=4 -m nemo_cv.recipes.sonobase.pretrain \
+#     -c ./configs/pretrain \
+#     experiment=pretrain_hiera_l_conv_b_conv_s_on_38_pt_8_bm \
+#     scratch.ckpt_path=${CHECKPOINT_DIR}/SAM2/sam2.1_hiera_large.pt
+
+defaults:
+  - override /data: 38_pt_8_bm
+  - override /model/image_encoder@model.image_encoder: hiera_l_conv_b_conv_s
+
+scratch:
+  experiment_name: sonobase/pretrain/38_pt_8_bm/hiera_l_conv_b_conv_s

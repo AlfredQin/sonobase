@@ -1,0 +1,16 @@
+# @package _global_
+# Sonobase test experiment for variant `hiera_l` on the 8 benchmark + 7
+# external test splits (15 datasets total). Mirrors
+# test_hiera_b_conv_s_conv_t_on_8_bm_7_ext but selects the hiera_l
+# image_encoder so the architecture matches the variant's pretraining DCP.
+
+defaults:
+  - override /data: 8_bm_7_ext
+  - override /model/image_encoder@model.image_encoder: hiera_l
+
+scratch:
+  experiment_name: sonobase/test/8_bm_7_ext/hiera_l
+
+model:
+  num_correction_pt_per_frame_val: 0  # 0 ~ 7, 0 = no correction
+  prob_to_use_box_input_for_eval: 0   # 0 = point prompt, 1 = box prompt

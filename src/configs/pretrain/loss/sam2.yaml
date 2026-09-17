@@ -1,0 +1,13 @@
+# SAM2 loss: MultiStepMultiMasksAndIous keyed by dataset name
+all:
+  _target_: nemo_cv.components.loss.sam2.MultiStepMultiMasksAndIous
+  weight_dict:
+    loss_mask: 20
+    loss_dice: 1
+    loss_iou: 1
+    loss_class: 1
+  supervise_all_iou: true
+  iou_use_l1_loss: true
+  pred_obj_scores: true
+  focal_gamma_obj_score: 0.0
+  focal_alpha_obj_score: -1.0

@@ -1,0 +1,447 @@
+
+# 8 benchmark + 7 external datasets = 15 test datasets
+
+
+test:
+  # Each key is a dataset name — separate loader for per-dataset metrics
+  # --------------------------------Benchmark datasets -----------------------------------------------------------------
+  BUSI:
+    _target_: nemo_cv.components.datasets.sam2.sam2_datasets.TorchTrainMixedDataset
+    phases_per_epoch: 1
+    batch_sizes:
+      - ${scratch.test_image_batch_size}
+    num_workers: ${scratch.num_train_workers}
+    shuffle: false
+    pin_memory: true
+    drop_last: false
+    collate_fn:
+      _target_: nemo_cv.components.datasets.sam2.data_utils.collate_fn
+      _partial_: true
+      dict_key: all
+    datasets:
+      - _target_: nemo_cv.components.datasets.sam2.utils.RepeatFactorWrapper
+        dataset:
+          _target_: nemo_cv.components.datasets.sam2.utils.ConcatDataset
+          datasets:
+            - _target_: nemo_cv.components.datasets.sam2.vos_dataset.VOSDataset
+              training: false
+              transforms: ${scratch.val_transforms}
+              multiplier: 1
+              video_dataset:
+                _target_: nemo_cv.components.datasets.sam2.vos_raw_dataset.SaUSRawDataset
+                img_folder: ${scratch.dataset_dir}/BUSI/images
+                gt_folder: ${scratch.dataset_dir}/BUSI/gt
+                file_list_txt: ${scratch.annotation_dir}/BUSI/test_list.txt
+              sampler: ${scratch.val_image_sampler}
+
+  Brachial-Plexus:
+    _target_: nemo_cv.components.datasets.sam2.sam2_datasets.TorchTrainMixedDataset
+    phases_per_epoch: 1
+    batch_sizes:
+      - ${scratch.test_video_batch_size}
+    num_workers: ${scratch.num_train_workers}
+    shuffle: false
+    pin_memory: true
+    drop_last: false
+    collate_fn:
+      _target_: nemo_cv.components.datasets.sam2.data_utils.collate_fn
+      _partial_: true
+      dict_key: all
+    datasets:
+      - _target_: nemo_cv.components.datasets.sam2.utils.RepeatFactorWrapper
+        dataset:
+          _target_: nemo_cv.components.datasets.sam2.utils.ConcatDataset
+          datasets:
+            - _target_: nemo_cv.components.datasets.sam2.vos_dataset.VOSDataset
+              training: false
+              transforms: ${scratch.val_transforms}
+              multiplier: 1
+              video_dataset:
+                _target_: nemo_cv.components.datasets.sam2.vos_raw_dataset.JSONRawDataset
+                img_folder: ${scratch.dataset_dir}/Brachial-Plexus/images
+                gt_folder: ${scratch.dataset_dir}/Brachial-Plexus/gt
+                file_list_txt: ${scratch.annotation_dir}/Brachial-Plexus/test_list.txt
+                ann_every: 1
+              sampler: ${scratch.val_video_sampler}
+
+  C-TRUS:
+    _target_: nemo_cv.components.datasets.sam2.sam2_datasets.TorchTrainMixedDataset
+    phases_per_epoch: 1
+    batch_sizes:
+      - ${scratch.test_image_batch_size}
+    num_workers: ${scratch.num_train_workers}
+    shuffle: false
+    pin_memory: true
+    drop_last: false
+    collate_fn:
+      _target_: nemo_cv.components.datasets.sam2.data_utils.collate_fn
+      _partial_: true
+      dict_key: all
+    datasets:
+      - _target_: nemo_cv.components.datasets.sam2.utils.RepeatFactorWrapper
+        dataset:
+          _target_: nemo_cv.components.datasets.sam2.utils.ConcatDataset
+          datasets:
+            - _target_: nemo_cv.components.datasets.sam2.vos_dataset.VOSDataset
+              training: false
+              transforms: ${scratch.val_transforms}
+              multiplier: 1
+              video_dataset:
+                _target_: nemo_cv.components.datasets.sam2.vos_raw_dataset.SaUSRawDataset
+                img_folder: ${scratch.dataset_dir}/C-TRUS/images
+                gt_folder: ${scratch.dataset_dir}/C-TRUS/gt
+                file_list_txt: ${scratch.annotation_dir}/C-TRUS/test_list.txt
+              sampler: ${scratch.val_image_sampler}
+
+  CAMUS:
+    _target_: nemo_cv.components.datasets.sam2.sam2_datasets.TorchTrainMixedDataset
+    phases_per_epoch: 1
+    batch_sizes:
+      - ${scratch.test_video_batch_size}
+    num_workers: ${scratch.num_train_workers}
+    shuffle: false
+    pin_memory: true
+    drop_last: false
+    collate_fn:
+      _target_: nemo_cv.components.datasets.sam2.data_utils.collate_fn
+      _partial_: true
+      dict_key: all
+    datasets:
+      - _target_: nemo_cv.components.datasets.sam2.utils.RepeatFactorWrapper
+        dataset:
+          _target_: nemo_cv.components.datasets.sam2.utils.ConcatDataset
+          datasets:
+            - _target_: nemo_cv.components.datasets.sam2.vos_dataset.VOSDataset
+              training: false
+              transforms: ${scratch.val_transforms}
+              multiplier: 1
+              video_dataset:
+                _target_: nemo_cv.components.datasets.sam2.vos_raw_dataset.JSONRawDataset
+                img_folder: ${scratch.dataset_dir}/CAMUS/images
+                gt_folder: ${scratch.dataset_dir}/CAMUS/gt
+                file_list_txt: ${scratch.annotation_dir}/CAMUS/test_list.txt
+                ann_every: 1
+              sampler: ${scratch.val_video_sampler}
+
+  HC18:
+    _target_: nemo_cv.components.datasets.sam2.sam2_datasets.TorchTrainMixedDataset
+    phases_per_epoch: 1
+    batch_sizes:
+      - ${scratch.test_image_batch_size}
+    num_workers: ${scratch.num_train_workers}
+    shuffle: false
+    pin_memory: true
+    drop_last: false
+    collate_fn:
+      _target_: nemo_cv.components.datasets.sam2.data_utils.collate_fn
+      _partial_: true
+      dict_key: all
+    datasets:
+      - _target_: nemo_cv.components.datasets.sam2.utils.RepeatFactorWrapper
+        dataset:
+          _target_: nemo_cv.components.datasets.sam2.utils.ConcatDataset
+          datasets:
+            - _target_: nemo_cv.components.datasets.sam2.vos_dataset.VOSDataset
+              training: false
+              transforms: ${scratch.val_transforms}
+              multiplier: 1
+              video_dataset:
+                _target_: nemo_cv.components.datasets.sam2.vos_raw_dataset.SaUSRawDataset
+                img_folder: ${scratch.dataset_dir}/HC18/images
+                gt_folder: ${scratch.dataset_dir}/HC18/gt
+                file_list_txt: ${scratch.annotation_dir}/HC18/test_list.txt
+              sampler: ${scratch.val_image_sampler}
+
+  PFUS:
+    _target_: nemo_cv.components.datasets.sam2.sam2_datasets.TorchTrainMixedDataset
+    phases_per_epoch: 1
+    batch_sizes:
+      - ${scratch.test_video_batch_size}
+    num_workers: ${scratch.num_train_workers}
+    shuffle: false
+    pin_memory: true
+    drop_last: false
+    collate_fn:
+      _target_: nemo_cv.components.datasets.sam2.data_utils.collate_fn
+      _partial_: true
+      dict_key: all
+    datasets:
+      - _target_: nemo_cv.components.datasets.sam2.utils.RepeatFactorWrapper
+        dataset:
+          _target_: nemo_cv.components.datasets.sam2.utils.ConcatDataset
+          datasets:
+            - _target_: nemo_cv.components.datasets.sam2.vos_dataset.VOSDataset
+              training: false
+              transforms: ${scratch.val_transforms}
+              multiplier: 1
+              video_dataset:
+                _target_: nemo_cv.components.datasets.sam2.vos_raw_dataset.JSONRawDataset
+                img_folder: ${scratch.dataset_dir}/PFUS/images
+                gt_folder: ${scratch.dataset_dir}/PFUS/gt
+                file_list_txt: ${scratch.annotation_dir}/PFUS/test_list.txt
+                ann_every: 1
+              sampler: ${scratch.val_video_sampler}
+
+  RegPro:
+    _target_: nemo_cv.components.datasets.sam2.sam2_datasets.TorchTrainMixedDataset
+    phases_per_epoch: 1
+    batch_sizes:
+      - ${scratch.test_video_batch_size}
+    num_workers: ${scratch.num_train_workers}
+    shuffle: false
+    pin_memory: true
+    drop_last: false
+    collate_fn:
+      _target_: nemo_cv.components.datasets.sam2.data_utils.collate_fn
+      _partial_: true
+      dict_key: all
+    datasets:
+      - _target_: nemo_cv.components.datasets.sam2.utils.RepeatFactorWrapper
+        dataset:
+          _target_: nemo_cv.components.datasets.sam2.utils.ConcatDataset
+          datasets:
+            - _target_: nemo_cv.components.datasets.sam2.vos_dataset.VOSDataset
+              training: false
+              transforms: ${scratch.val_transforms}
+              multiplier: 1
+              video_dataset:
+                _target_: nemo_cv.components.datasets.sam2.vos_raw_dataset.JSONRawDataset
+                img_folder: ${scratch.dataset_dir}/RegPro/images
+                gt_folder: ${scratch.dataset_dir}/RegPro/gt
+                file_list_txt: ${scratch.annotation_dir}/RegPro/test_list.txt
+                ann_every: 1
+              sampler: ${scratch.val_video_sampler}
+
+  TG3K:
+    _target_: nemo_cv.components.datasets.sam2.sam2_datasets.TorchTrainMixedDataset
+    phases_per_epoch: 1
+    batch_sizes:
+      - ${scratch.test_image_batch_size}
+    num_workers: ${scratch.num_train_workers}
+    shuffle: false
+    pin_memory: true
+    drop_last: false
+    collate_fn:
+      _target_: nemo_cv.components.datasets.sam2.data_utils.collate_fn
+      _partial_: true
+      dict_key: all
+    datasets:
+      - _target_: nemo_cv.components.datasets.sam2.utils.RepeatFactorWrapper
+        dataset:
+          _target_: nemo_cv.components.datasets.sam2.utils.ConcatDataset
+          datasets:
+            - _target_: nemo_cv.components.datasets.sam2.vos_dataset.VOSDataset
+              training: false
+              transforms: ${scratch.val_transforms}
+              multiplier: 1
+              video_dataset:
+                _target_: nemo_cv.components.datasets.sam2.vos_raw_dataset.SaUSRawDataset
+                img_folder: ${scratch.dataset_dir}/TG3K/images
+                gt_folder: ${scratch.dataset_dir}/TG3K/gt
+                file_list_txt: ${scratch.annotation_dir}/TG3K/test_list.txt
+              sampler: ${scratch.val_image_sampler}
+
+  # ------------------------------- External datasets -----------------------------------------------------------------
+  ACOUSLIC:
+    _target_: nemo_cv.components.datasets.sam2.sam2_datasets.TorchTrainMixedDataset
+    phases_per_epoch: 1
+    batch_sizes:
+      - ${scratch.test_video_batch_size}
+    num_workers: ${scratch.num_train_workers}
+    shuffle: false
+    pin_memory: true
+    drop_last: false
+    collate_fn:
+      _target_: nemo_cv.components.datasets.sam2.data_utils.collate_fn
+      _partial_: true
+      dict_key: all
+    datasets:
+      - _target_: nemo_cv.components.datasets.sam2.utils.RepeatFactorWrapper
+        dataset:
+          _target_: nemo_cv.components.datasets.sam2.utils.ConcatDataset
+          datasets:
+            - _target_: nemo_cv.components.datasets.sam2.vos_dataset.VOSDataset
+              training: false
+              transforms: ${scratch.val_transforms}
+              multiplier: 1
+              video_dataset:
+                _target_: nemo_cv.components.datasets.sam2.vos_raw_dataset.JSONRawDataset
+                img_folder: ${scratch.dataset_dir}/ACOUSLIC/images
+                gt_folder: ${scratch.dataset_dir}/ACOUSLIC/gt
+                file_list_txt: ${scratch.annotation_dir}/ACOUSLIC/test_list.txt
+                ann_every: 1
+              sampler: ${scratch.val_video_sampler}
+
+  BUS-BRA:
+    _target_: nemo_cv.components.datasets.sam2.sam2_datasets.TorchTrainMixedDataset
+    phases_per_epoch: 1
+    batch_sizes:
+      - ${scratch.test_image_batch_size}
+    num_workers: ${scratch.num_train_workers}
+    shuffle: false
+    pin_memory: true
+    drop_last: false
+    collate_fn:
+      _target_: nemo_cv.components.datasets.sam2.data_utils.collate_fn
+      _partial_: true
+      dict_key: all
+    datasets:
+      - _target_: nemo_cv.components.datasets.sam2.utils.RepeatFactorWrapper
+        dataset:
+          _target_: nemo_cv.components.datasets.sam2.utils.ConcatDataset
+          datasets:
+            - _target_: nemo_cv.components.datasets.sam2.vos_dataset.VOSDataset
+              training: false
+              transforms: ${scratch.val_transforms}
+              multiplier: 1
+              video_dataset:
+                _target_: nemo_cv.components.datasets.sam2.vos_raw_dataset.SaUSRawDataset
+                img_folder: ${scratch.dataset_dir}/BUS-BRA/images
+                gt_folder: ${scratch.dataset_dir}/BUS-BRA/gt
+                file_list_txt: ${scratch.annotation_dir}/BUS-BRA/test_list.txt
+              sampler: ${scratch.val_image_sampler}
+
+  DDTI:
+    _target_: nemo_cv.components.datasets.sam2.sam2_datasets.TorchTrainMixedDataset
+    phases_per_epoch: 1
+    batch_sizes:
+      - ${scratch.test_image_batch_size}
+    num_workers: ${scratch.num_train_workers}
+    shuffle: false
+    pin_memory: true
+    drop_last: false
+    collate_fn:
+      _target_: nemo_cv.components.datasets.sam2.data_utils.collate_fn
+      _partial_: true
+      dict_key: all
+    datasets:
+      - _target_: nemo_cv.components.datasets.sam2.utils.RepeatFactorWrapper
+        dataset:
+          _target_: nemo_cv.components.datasets.sam2.utils.ConcatDataset
+          datasets:
+            - _target_: nemo_cv.components.datasets.sam2.vos_dataset.VOSDataset
+              training: false
+              transforms: ${scratch.val_transforms}
+              multiplier: 1
+              video_dataset:
+                _target_: nemo_cv.components.datasets.sam2.vos_raw_dataset.SaUSRawDataset
+                img_folder: ${scratch.dataset_dir}/DDTI/images
+                gt_folder: ${scratch.dataset_dir}/DDTI/gt
+                file_list_txt: ${scratch.annotation_dir}/DDTI/test_list.txt
+              sampler: ${scratch.val_image_sampler}
+
+  FUGC:
+    _target_: nemo_cv.components.datasets.sam2.sam2_datasets.TorchTrainMixedDataset
+    phases_per_epoch: 1
+    batch_sizes:
+      - ${scratch.test_image_batch_size}
+    num_workers: ${scratch.num_train_workers}
+    shuffle: false
+    pin_memory: true
+    drop_last: false
+    collate_fn:
+      _target_: nemo_cv.components.datasets.sam2.data_utils.collate_fn
+      _partial_: true
+      dict_key: all
+    datasets:
+      - _target_: nemo_cv.components.datasets.sam2.utils.RepeatFactorWrapper
+        dataset:
+          _target_: nemo_cv.components.datasets.sam2.utils.ConcatDataset
+          datasets:
+            - _target_: nemo_cv.components.datasets.sam2.vos_dataset.VOSDataset
+              training: false
+              transforms: ${scratch.val_transforms}
+              multiplier: 1
+              video_dataset:
+                _target_: nemo_cv.components.datasets.sam2.vos_raw_dataset.SaUSRawDataset
+                img_folder: ${scratch.dataset_dir}/FUGC/images
+                gt_folder: ${scratch.dataset_dir}/FUGC/gt
+                file_list_txt: ${scratch.annotation_dir}/FUGC/test_list.txt
+              sampler: ${scratch.val_image_sampler}
+
+  KidneyUS:
+    _target_: nemo_cv.components.datasets.sam2.sam2_datasets.TorchTrainMixedDataset
+    phases_per_epoch: 1
+    batch_sizes:
+      - ${scratch.test_image_batch_size}
+    num_workers: ${scratch.num_train_workers}
+    shuffle: false
+    pin_memory: true
+    drop_last: false
+    collate_fn:
+      _target_: nemo_cv.components.datasets.sam2.data_utils.collate_fn
+      _partial_: true
+      dict_key: all
+    datasets:
+      - _target_: nemo_cv.components.datasets.sam2.utils.RepeatFactorWrapper
+        dataset:
+          _target_: nemo_cv.components.datasets.sam2.utils.ConcatDataset
+          datasets:
+            - _target_: nemo_cv.components.datasets.sam2.vos_dataset.VOSDataset
+              training: false
+              transforms: ${scratch.val_transforms}
+              multiplier: 1
+              video_dataset:
+                _target_: nemo_cv.components.datasets.sam2.vos_raw_dataset.SaUSRawDataset
+                img_folder: ${scratch.dataset_dir}/KidneyUS/images
+                gt_folder: ${scratch.dataset_dir}/KidneyUS/gt
+                file_list_txt: ${scratch.annotation_dir}/KidneyUS/test_list.txt
+              sampler: ${scratch.val_image_sampler}
+
+  LUMINOUS:
+    _target_: nemo_cv.components.datasets.sam2.sam2_datasets.TorchTrainMixedDataset
+    phases_per_epoch: 1
+    batch_sizes:
+      - ${scratch.test_image_batch_size}
+    num_workers: ${scratch.num_train_workers}
+    shuffle: false
+    pin_memory: true
+    drop_last: false
+    collate_fn:
+      _target_: nemo_cv.components.datasets.sam2.data_utils.collate_fn
+      _partial_: true
+      dict_key: all
+    datasets:
+      - _target_: nemo_cv.components.datasets.sam2.utils.RepeatFactorWrapper
+        dataset:
+          _target_: nemo_cv.components.datasets.sam2.utils.ConcatDataset
+          datasets:
+            - _target_: nemo_cv.components.datasets.sam2.vos_dataset.VOSDataset
+              training: false
+              transforms: ${scratch.val_transforms}
+              multiplier: 1
+              video_dataset:
+                _target_: nemo_cv.components.datasets.sam2.vos_raw_dataset.SaUSRawDataset
+                img_folder: ${scratch.dataset_dir}/LUMINOUS/images
+                gt_folder: ${scratch.dataset_dir}/LUMINOUS/gt
+                file_list_txt: ${scratch.annotation_dir}/LUMINOUS/test_list.txt
+              sampler: ${scratch.val_image_sampler}
+
+  MMOTU-3d:
+    _target_: nemo_cv.components.datasets.sam2.sam2_datasets.TorchTrainMixedDataset
+    phases_per_epoch: 1
+    batch_sizes:
+      - ${scratch.test_image_batch_size}
+    num_workers: ${scratch.num_train_workers}
+    shuffle: false
+    pin_memory: true
+    drop_last: false
+    collate_fn:
+      _target_: nemo_cv.components.datasets.sam2.data_utils.collate_fn
+      _partial_: true
+      dict_key: all
+    datasets:
+      - _target_: nemo_cv.components.datasets.sam2.utils.RepeatFactorWrapper
+        dataset:
+          _target_: nemo_cv.components.datasets.sam2.utils.ConcatDataset
+          datasets:
+            - _target_: nemo_cv.components.datasets.sam2.vos_dataset.VOSDataset
+              training: false
+              transforms: ${scratch.val_transforms}
+              multiplier: 1
+              video_dataset:
+                _target_: nemo_cv.components.datasets.sam2.vos_raw_dataset.SaUSRawDataset
+                img_folder: ${scratch.dataset_dir}/MMOTU-3d/images
+                gt_folder: ${scratch.dataset_dir}/MMOTU-3d/gt
+                file_list_txt: ${scratch.annotation_dir}/MMOTU-3d/test_list.txt
+              sampler: ${scratch.val_image_sampler}

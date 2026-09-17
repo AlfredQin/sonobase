@@ -1,0 +1,77 @@
+# Project-wide variables for the few-shot adaptation suite.
+#
+# Mirrors `pretrain/scratch/default.yaml` and `analysis/scratch/default.yaml`
+# but adds the few-shot-specific knobs. Override per-run via Hydra CLI.
+
+resolution: 1024                                    # SAM2 native input size
+seed: 42
+
+# Dataset roots — DATASET_DIR and ANNOTATION_DIR must be set in env, e.g.:
+#   export DATASET_DIR=$WORK/Dataset/SaUS
+#   export ANNOTATION_DIR=$WORK/Dataset/SaUS_Annotation/38_pt_8_bm_7_ext
+# OmegaConf raises if either is unset at resolve time.
+dataset_dir: ${oc.env:DATASET_DIR}
+annotation_dir: ${oc.env:ANNOTATION_DIR}
+
+# Where the deterministic per-(dataset, N, seed) split files live.
+splits_dir: ./experiments/few_shot/few_shot_splits
+
+# Per-run identifiers — set by experiment overlay or CLI.
+dataset_name: ???
+model_label: ???
+N: ???
+fewshot_seed: ???
+prompt_unit_tag: ???                               # e.g. "video" | "frame" — see below
+
+# Model-aware: per-(dataset × model × N × seed) checkpoint dir name.
+experiment_name: ${scratch.dataset_name}_${scratch.model_label}_N${scratch.N}_seed${scratch.fewshot_seed}
+
+# Model-AGNOSTIC: per-(dataset × N × seed) subset filename. The same subset
+# must be used for all 3 models at a given (dataset, N, seed) — all 3 models
+# point at this same .txt.
+subset_basename: ${scratch.dataset_name}_N${scratch.N}_seed${scratch.fewshot_seed}
+
+# Training-data sampling unit (only meaningful for ACOUSLIC):
+#   - video (default): each training example is one full annotated video
+#   - frame (TODO):    each training example is one annotated frame
+training_unit: video
+
+# Loss + decoder-only training knobs.
+batch_size: 1                                      # min(N, 4) is set per-run by the recipe
+num_workers: 4
+
+# Augmentations:
+#   HFlip(p=0.5), rotation ±15°, scale [0.9, 1.1].
+# We override RandomAffine's degrees / scale to match the protocol.
+fewshot_train_transforms:
+  _target_: nemo_cv.components.datasets.sam2.transforms.ComposeAPI
+  transforms:
+    - _target_: nemo_cv.components.datasets.sam2.transforms.RandomHorizontalFlip
+      consistent_transform: true
+    - _target_: nemo_cv.components.datasets.sam2.transforms.RandomAffine
+      degrees: 15                                  # ±15°
+      shear: 0                                     # no shear
+      scale: [0.9, 1.1]                            # scale [0.9, 1.1]
+      image_interpolation: bilinear
+      consistent_transform: true
+    - _target_: nemo_cv.components.datasets.sam2.transforms.RandomResizeAPI
+      sizes: ${scratch.resolution}
+      square: true
+      consistent_transform: true
+    - _target_: nemo_cv.components.datasets.sam2.transforms.ToTensorAPI
+    - _target_: nemo_cv.components.datasets.sam2.transforms.NormalizeAPI
+      mean: [0.485, 0.456, 0.406]
+      std: [0.229, 0.224, 0.225]
+
+# Sampler used inside VOSDataset for video data (e.g. CAMUS / ACOUSLIC).
+# 8 frames per training step is the same as pretrain.
+train_video_sampler:
+  _target_: nemo_cv.components.datasets.sam2.vos_sampler.RandomUniformSampler
+  num_frames: 8
+  max_num_objects: 20
+
+# Sampler for image data (1 frame per step).
+train_image_sampler:
+  _target_: nemo_cv.components.datasets.sam2.vos_sampler.RandomUniformSampler
+  num_frames: 1
+  max_num_objects: 20

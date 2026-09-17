@@ -1,0 +1,16 @@
+# Brachial-Plexus — video dataset (nerve block; categories `nerve_plexus`, `needle`).
+#
+# SaUS layout:
+#   <saus_dir>/images/<sample_id>/<frame:05d>.jpg
+#   <saus_dir>/gt/<sample_id>_manual.json
+#
+# Test split = canonical project list (44 sequences) from the v2 deduplicated
+# annotation dir, the same list the pretraining benchmark evaluates. Prompted once and propagated,
+# matching the other video datasets in this pipeline. Added for the evaluation-protocol unification.
+
+name: Brachial-Plexus
+kind: video
+saus_dir: ${scratch.dataset_dir}/Brachial-Plexus
+split_list_txt: ${scratch.annotation_dir}/Brachial-Plexus/test_list.txt
+gt_suffix: _manual
+gt_ext: .json

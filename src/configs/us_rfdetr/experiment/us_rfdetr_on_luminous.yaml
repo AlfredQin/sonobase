@@ -1,0 +1,8 @@
+# @package _global_
+# US-RFDETR on LUMINOUS (lung ultrasound, 1 class: b_line).
+defaults:
+  - override /data_module: luminous
+
+scratch:
+  experiment_name: us_rfdetr/luminous
+  batch_size: 8

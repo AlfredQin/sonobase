@@ -1,0 +1,126 @@
+resolution: 1024
+seed: 42
+num_epochs: 40
+
+# DATASET_DIR and ANNOTATION_DIR must be set in env (e.g. in .bashrc:
+#   export DATASET_DIR=$WORK/Dataset/SaUS
+#   export ANNOTATION_DIR=$WORK/Dataset/SaUS_Annotation/35_pt_8_bm_7_ext_dedup
+# OmegaConf raises if these are unset at resolve time.
+dataset_dir: ${oc.env:DATASET_DIR}
+annotation_dir: ${oc.env:ANNOTATION_DIR}
+# Initial Hiera-B+ weights for the TriBranchTrunk's branch0. CHECKPOINT_DIR
+# is required — set in your shell (e.g. `export CHECKPOINT_DIR=$WORK/Checkpoints`).
+# See README.md § "Asset preparation".
+ckpt_path: ${oc.env:CHECKPOINT_DIR}/SAM2/sam2.1_hiera_base_plus.pt
+
+experiment_name: sonobase/pretrain/default
+
+# -----------------------------Dataset and dataloader-----------------------------
+train_video_batch_size: 1
+train_image_batch_size: 8
+val_video_batch_size: 1  # MUST be 1: EvalSampler returns all frames so videos have variable length and cannot be stacked
+val_image_batch_size: 8
+test_video_batch_size: 1
+test_image_batch_size: 1
+num_frames: 8
+max_num_objects: 20
+num_train_workers: 8
+
+train_video_sampler:
+  _target_: nemo_cv.components.datasets.sam2.vos_sampler.RandomUniformSampler
+  num_frames: ${scratch.num_frames}
+  max_num_objects: ${scratch.max_num_objects}
+
+train_image_sampler:
+  _target_: nemo_cv.components.datasets.sam2.vos_sampler.RandomUniformSampler
+  num_frames: 1
+  max_num_objects: ${scratch.max_num_objects}
+
+val_video_sampler:
+  _target_: nemo_cv.components.datasets.sam2.vos_sampler.EvalSampler
+
+val_image_sampler:
+  _target_: nemo_cv.components.datasets.sam2.vos_sampler.EvalSampler
+
+train_transforms:
+  _target_: nemo_cv.components.datasets.sam2.transforms.ComposeAPI
+  transforms:
+    - _target_: nemo_cv.components.datasets.sam2.transforms.RandomHorizontalFlip
+      consistent_transform: true
+    - _target_: nemo_cv.components.datasets.sam2.transforms.RandomAffine
+      degrees: 25
+      shear: 20
+      image_interpolation: bilinear
+      consistent_transform: true
+    - _target_: nemo_cv.components.datasets.sam2.transforms.RandomResizeAPI
+      sizes: ${scratch.resolution}
+      square: true
+      consistent_transform: true
+    - _target_: nemo_cv.components.datasets.sam2.transforms.ColorJitter
+      consistent_transform: true
+      brightness: 0.1
+      contrast: 0.03
+      saturation: 0.03
+      hue: null
+    - _target_: nemo_cv.components.datasets.sam2.transforms.RandomGrayscale
+      p: 0.05
+      consistent_transform: true
+    - _target_: nemo_cv.components.datasets.sam2.transforms.ColorJitter
+      consistent_transform: false
+      brightness: 0.1
+      contrast: 0.05
+      saturation: 0.05
+      hue: null
+    - _target_: nemo_cv.components.datasets.sam2.transforms.ToTensorAPI
+    - _target_: nemo_cv.components.datasets.sam2.transforms.NormalizeAPI
+      mean: [0.485, 0.456, 0.406]
+      std: [0.229, 0.224, 0.225]
+
+# Same composition as `train_transforms`, but with the leading
+# RandomHorizontalFlip removed. Used by laterality-sensitive datasets
+# (cardiac apical-4-chamber: EchoCP, RVENet; breast ABUS: TDSC-ABUS) where
+# left-right anatomy is fixed and a flip exchanges anatomically distinct
+# structures (LV ↔ RV; left-breast ↔ right-breast scan orientation).
+train_transforms_no_hflip:
+  _target_: nemo_cv.components.datasets.sam2.transforms.ComposeAPI
+  transforms:
+    - _target_: nemo_cv.components.datasets.sam2.transforms.RandomAffine
+      degrees: 25
+      shear: 20
+      image_interpolation: bilinear
+      consistent_transform: true
+    - _target_: nemo_cv.components.datasets.sam2.transforms.RandomResizeAPI
+      sizes: ${scratch.resolution}
+      square: true
+      consistent_transform: true
+    - _target_: nemo_cv.components.datasets.sam2.transforms.ColorJitter
+      consistent_transform: true
+      brightness: 0.1
+      contrast: 0.03
+      saturation: 0.03
+      hue: null
+    - _target_: nemo_cv.components.datasets.sam2.transforms.RandomGrayscale
+      p: 0.05
+      consistent_transform: true
+    - _target_: nemo_cv.components.datasets.sam2.transforms.ColorJitter
+      consistent_transform: false
+      brightness: 0.1
+      contrast: 0.05
+      saturation: 0.05
+      hue: null
+    - _target_: nemo_cv.components.datasets.sam2.transforms.ToTensorAPI
+    - _target_: nemo_cv.components.datasets.sam2.transforms.NormalizeAPI
+      mean: [0.485, 0.456, 0.406]
+      std: [0.229, 0.224, 0.225]
+
+val_transforms:
+  _target_: nemo_cv.components.datasets.sam2.transforms.ComposeAPI
+  transforms:
+    - _target_: nemo_cv.components.datasets.sam2.transforms.RandomResizeAPI
+      sizes: ${scratch.resolution}
+      square: true
+      consistent_transform: true
+    - _target_: nemo_cv.components.datasets.sam2.transforms.ToTensorAPI
+    - _target_: nemo_cv.components.datasets.sam2.transforms.NormalizeAPI
+      mean: [0.485, 0.456, 0.406]
+      std: [0.229, 0.224, 0.225]

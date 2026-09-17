@@ -1,0 +1,61 @@
+_target_: nemo_cv.components.models.sam2.modeling.backbones.image_encoder.ImageEncoder
+trunk:
+  _target_: nemo_cv.components.models.sonobase.image_encoder.image_pyramid_hybrid_encoder.TriBranchTrunk
+  img_size0: 512
+  img_size1: 768
+  img_size2: ${scratch.resolution}
+  # See hiera_b_conv_s_conv_t.yaml for why ckpt_path0 is null in the test tree.
+  ckpt_path0: null
+  ckpt_path1: null
+  ckpt_path2: null
+
+  branch0:
+    _target_: nemo_cv.components.models.sonobase.image_encoder.hiera.HieraWrapper
+    embed_dim: 144
+    num_heads: 2
+    stages: [2, 6, 36, 4]
+    global_att_blocks: [23, 33, 43]
+    window_pos_embed_bkg_spatial_size: [7, 7]
+    window_spec: [8, 4, 16, 8]
+    drop_path_rate: 0.
+
+  branch1:
+    _target_: nemo_cv.components.models.sonobase.image_encoder.convnext.ConvNeXtWrapper
+    model_name: convnext_base.dinov3_lvd1689m
+    pretrained: true
+    drop_path_rate: 0.
+
+  branch2:
+    _target_: nemo_cv.components.models.sonobase.image_encoder.convnext.ConvNeXtWrapper
+    model_name: convnext_small.dinov3_lvd1689m
+    pretrained: true
+    drop_path_rate: 0.
+
+  branch0_indices: [[0, 2], [2, 8], [8, 12], [12, 16], [16, 20], [20, 24], [24, 28], [28, 32], [32, 36], [36, 40], [40, 44], [44, 48]]
+  branch1_indices: [[0, 3], [3, 7], [7, 10], [10, 13], [13, 16], [16, 19], [19, 22], [22, 25], [25, 28], [28, 31], [31, 35], [35, 39]]
+  branch2_indices: [[0, 3], [3, 7], [7, 10], [10, 13], [13, 16], [16, 19], [19, 22], [22, 25], [25, 28], [28, 31], [31, 35], [35, 39]]
+  return_indices: [0, 1, 10, 11]
+  branch0_dims: [144, 288, 576, 576, 576, 576, 576, 576, 576, 576, 576, 1152]
+  branch1_dims: [128, 256, 512, 512, 512, 512, 512, 512, 512, 512, 512, 1024]
+  branch2_dims: [96, 192, 384, 384, 384, 384, 384, 384, 384, 384, 384, 768]
+  num_heads: [4, 8, 16, 16, 16, 16, 16, 16, 16, 16, 16, 32]
+  with_cross_branch_interaction: True
+  interact_type: deform_self_attn
+  init_values: 0.
+  ffn: null
+  expand_ratio: 0.25
+  merge_location: before_interact
+scalp: 1
+
+neck:
+  _target_: nemo_cv.components.models.sam2.modeling.backbones.image_encoder.FpnNeck
+  position_encoding:
+    _target_: nemo_cv.components.models.sam2.modeling.position_encoding.PositionEmbeddingSine
+    num_pos_feats: 256
+    normalize: true
+    scale: null
+    temperature: 10000
+  d_model: 256
+  backbone_channel_list: [1152, 576, 288, 144]
+  fpn_top_down_levels: [2, 3]
+  fpn_interp_model: nearest

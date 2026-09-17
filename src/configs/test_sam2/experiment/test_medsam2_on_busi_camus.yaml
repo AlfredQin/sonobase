@@ -1,0 +1,16 @@
+# @package _global_
+# MedSAM2 smoke test on BUSI + CAMUS. MedSAM2 is a medical-image fine-tune of
+# SAM2-Tiny, so this overlay swaps in the Hiera-Tiny image encoder.
+#
+# CLI (CHECKPOINT_DIR must be set in env — e.g. `export CHECKPOINT_DIR=$WORK/Checkpoints`):
+#   uv run torchrun --nproc-per-node=4 -m nemo_cv.recipes.benchmarks.test_sam2 \
+#     -c ./configs/test_sam2 -cn test \
+#     experiment=test_medsam2_on_busi_camus \
+#     ckpt_path=${CHECKPOINT_DIR}/MedSAM2/MedSAM2_latest.pt
+
+defaults:
+  - override /model/image_encoder@model.image_encoder: hiera_t
+  - override /data: busi_camus
+
+scratch:
+  experiment_name: benchmarks/busi_camus/medsam2/p0

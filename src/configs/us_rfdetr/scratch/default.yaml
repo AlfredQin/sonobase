@@ -1,0 +1,31 @@
+# Project-wide variables for the US-RFDETR Hydra tree.
+#
+# CHECKPOINT_DIR and DET_ANNOTATION_DIR must be set per user (e.g. in
+# your .bashrc: `export CHECKPOINT_DIR=$WORK/Checkpoints`). DATASET_DIR
+# defaults to the shared cluster mount. Detection-specific annotations
+# live under DET_ANNOTATION_DIR — separate from the segmentation-side
+# ANNOTATION_DIR because the per-image label format differs
+# (per-instance category_id + RLE segmentation).
+
+image_size: 1024
+seed: 42
+
+# Dataset roots — all three env vars are required (set in your .bashrc, e.g.
+#   export DATASET_DIR=$WORK/Dataset/SaUS
+#   export DET_ANNOTATION_DIR=$WORK/Dataset/Ultrasound/Dense_Pred_Annotation
+#   export CHECKPOINT_DIR=$WORK/Checkpoints
+# ). OmegaConf raises if any is unset at resolve time.
+dataset_dir: ${oc.env:DATASET_DIR}
+det_annotation_dir: ${oc.env:DET_ANNOTATION_DIR}
+checkpoint_dir: ${oc.env:CHECKPOINT_DIR}
+
+# Per-(dataset × backbone) experiment name; the experiment overlays
+# embed the dataset, the backbone group injects ${scratch.backbone_name},
+# and the recipe writes to ./experiments/${scratch.experiment_name}/.
+experiment_name: us_rfdetr/default
+backbone_name: ???       # set by `backbone=<sam2_no_ft|medsam2|sonobase>`
+
+# DataLoader knobs (override per-dataset in data_module/<X>.yaml if needed)
+batch_size: 4
+num_workers: 8
+multiplier: 1            # repeat training samples N times for tiny datasets

@@ -1,0 +1,8 @@
+# @package _global_
+# US-RFDETR on DDTI (thyroid ultrasound, 1 class: thyroid_nodule).
+defaults:
+  - override /data_module: ddti
+
+scratch:
+  experiment_name: us_rfdetr/ddti
+  batch_size: 8
