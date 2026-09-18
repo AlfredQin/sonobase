@@ -8,7 +8,7 @@
 [![Weights](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-SonoBase%20weights-yellow)](https://huggingface.co/AlfredQin/sonobase)
 [![Data](https://img.shields.io/badge/Zenodo-SonoCorpus%20manifest%2010.5281%2Fzenodo.22770825-1682D4)](https://doi.org/10.5281/zenodo.22770825)
 ![Demo](https://img.shields.io/badge/%F0%9F%A4%97%20Space-demo%20coming%20soon-blue)
-![Website](https://img.shields.io/badge/Project-website%20coming%20soon-2ea44f)
+[![Website](https://img.shields.io/badge/Project-website-2ea44f)](https://alfredqin.github.io/sonobase-web/)
 [![License: MIT](https://img.shields.io/badge/Code%20license-MIT-green)](LICENSE) [![Weights: CC BY-NC 4.0](https://img.shields.io/badge/Weights-CC%20BY--NC%204.0-blue)](https://huggingface.co/AlfredQin/sonobase)
 
 <img src="docs/fig1_portrait.png" alt="SonoCorpus and SonoBase overview" width="720">
@@ -49,7 +49,7 @@ inter-observer variability.
 | Pretrained weights + optimizer states | https://huggingface.co/AlfredQin/sonobase | `sonobase_hiera_b_conv_s_conv_t.pt` (706 MB) and the full distributed checkpoint (2.1 GB) |
 | SonoCorpus manifest: dataset sources and licences, split lists, per-file checksums, per-unit metadata, evaluation records | https://doi.org/10.5281/zenodo.22770825 | manifest only (CC BY 4.0); no images or masks are re-hosted, datasets are obtained from their sources under their own terms; `tools/verify_manifest.py` checks a local copy against it |
 | Interactive demo | coming soon (Hugging Face Space) | point / box prompts on images, prompt-once propagation on clips |
-| Project website | coming soon | figures, results, dataset and licence tables |
+| Project website | https://alfredqin.github.io/sonobase-web/ | figures, results, dataset inventory and licence table |
 
 ## Installation
 
