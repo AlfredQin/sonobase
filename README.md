@@ -4,7 +4,7 @@
 
 ### Open ultrasound foundation model for robust segmentation and clinical measurement across heterogeneous settings
 
-![Paper](https://img.shields.io/badge/Paper-arXiv%20coming%20soon-b31b1b.svg)
+[![Paper](https://img.shields.io/badge/arXiv-2609.19230-b31b1b.svg)](https://arxiv.org/abs/2609.19230)
 [![Weights](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-SonoBase%20weights-yellow)](https://huggingface.co/AlfredQin/sonobase)
 [![Data](https://img.shields.io/badge/Zenodo-SonoCorpus%20manifest%2010.5281%2Fzenodo.22770825-1682D4)](https://doi.org/10.5281/zenodo.22770825)
 ![Demo](https://img.shields.io/badge/%F0%9F%A4%97%20Space-demo%20coming%20soon-blue)
@@ -44,6 +44,7 @@ inter-observer variability.
 
 | Artifact | Where | Notes |
 |---|---|---|
+| Paper | https://arxiv.org/abs/2609.19230 | preprint (arXiv:2609.19230), main text and supplementary information |
 | Code (this repository) | https://github.com/AlfredQin/sonobase | training, evaluation, few-shot, analysis and figure scripts |
 | Pretrained weights + optimizer states | https://huggingface.co/AlfredQin/sonobase | `sonobase_hiera_b_conv_s_conv_t.pt` (706 MB) and the full distributed checkpoint (2.1 GB) |
 | SonoCorpus manifest: dataset sources and licences, split lists, per-file checksums, per-unit metadata, evaluation records | https://doi.org/10.5281/zenodo.22770825 | manifest only (CC BY 4.0); no images or masks are re-hosted, datasets are obtained from their sources under their own terms; `tools/verify_manifest.py` checks a local copy against it |
@@ -116,11 +117,15 @@ removed and the leak-free splits generated is described in [docs/DATA_SPLITS.md]
 
 ```bibtex
 @article{sonobase2026,
-  title   = {Open ultrasound foundation model for robust segmentation and clinical measurement across heterogeneous settings},
-  author  = {Qin, Chao and Khan, Fahad Shahbaz and Khan, Salman and Ather, Sarim and
-             Anwar, Siddiq and Anwer, Rao Muhammad and Khan, Shadab},
-  journal = {arXiv preprint arXiv:XXXX.XXXXX},
-  year    = {2026}
+  title         = {Open ultrasound foundation model for robust segmentation and clinical measurement across heterogeneous settings},
+  author        = {Qin, Chao and Khan, Fahad Shahbaz and Khan, Salman and Ather, Sarim and
+                   Anwar, Siddiq and Anwer, Rao Muhammad and Khan, Shadab},
+  journal       = {arXiv preprint arXiv:2609.19230},
+  year          = {2026},
+  eprint        = {2609.19230},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.CV},
+  doi           = {10.48550/arXiv.2609.19230}
 }
 ```
 
